@@ -7,6 +7,8 @@ import {
   Platform,
   TextInput,
   TouchableOpacity,
+  ActivityIndicator,
+  Alert,
 } from 'react-native';
 import { BlurView } from 'expo-blur';
 import colors from 'config/colors';
@@ -27,6 +29,18 @@ function SigninScreen(props) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isSecure, setIsSecure] = useState(true);
+
+  const handleSignIn = async () => {
+    if (!email || !password){
+      Alert.alert('Error', 'Please enter email and password.')
+      return;
+    }
+    try {
+      await Auth.login(email, password);
+    } catch(error){
+      Alert.alert('Sign In Failed ', error.message);
+    }
+  }
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.background}>
@@ -75,8 +89,9 @@ function SigninScreen(props) {
         </View>
         <Typo style={styles.recoverTxt}>Recovery Possword</Typo>
         <AppButton
-          onPress={() => Auth.setUser('123')}
-          label={'Sign in'}
+          onPress={handleSignIn}
+          label={Auth.loading ? <ActivityIndicator color={colors.white} /> : 'Sign in'}
+          disabled={Auth.loading}
           style={{ backgroundColor: colors.primary, borderRadius: radius._12 }}
         />
         <View style={styles.orContinueRow}>

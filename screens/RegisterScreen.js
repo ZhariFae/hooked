@@ -7,6 +7,8 @@ import {
   Platform,
   TextInput,
   TouchableOpacity,
+  ActivityIndicator,
+  Alert,
 } from 'react-native';
 import { BlurView } from 'expo-blur';
 import colors from 'config/colors';
@@ -28,6 +30,18 @@ function RegisterScreen(props) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isSecure, setIsSecure] = useState(true);
+
+  const handleRegister = async() => {
+    if (!name || !email || !password) {
+      Alert.alert('Error', 'Name, email, and password are required.')
+      return;
+    }
+    try{
+      await Auth.signup(name, email, password);
+    }catch (error){
+      Alert.alert('Registration Failed.', error.message);
+    }
+  }
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.background}>
@@ -82,8 +96,9 @@ function RegisterScreen(props) {
           )}
         </View>
         <AppButton
-          onPress={() => Auth.setUser('123')}
-          label={'Register'}
+          onPress={handleRegister}
+          label={Auth.loading ? <ActivityIndicator color={colors.white} /> : 'Register'}
+          disabled={Auth.loading}
           style={{
             backgroundColor: colors.primary,
             borderRadius: radius._12,

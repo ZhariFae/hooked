@@ -44,6 +44,12 @@ function ProfileScreen(props) {
       </TouchableOpacity>
     );
   };
+
+  const placeholderImage = "https://img.freepik.com/free-photo/handsome-smiling-man-looking-with-disbelief_176420-19591.jpg?t=st=1723641040~exp=1723644640~hmac=aef27975e23ff9df20ea1f41d340106576264a0d6c9400a220ad615579e1340b&w=740"
+  
+  const userName = Auth.user?.displayName || 'User Name';
+  const userEmail = Auth.user?.email || 'user@example.com';
+
   return (
     <ScreenComponent style={styles.container}>
       <BlurView intensity={100} tint="extraLight" style={styles.blurContainer} />
@@ -56,16 +62,16 @@ function ProfileScreen(props) {
       <View style={styles.topRow}>
         <Image
           source={{
-            uri: 'https://img.freepik.com/free-photo/handsome-smiling-man-looking-with-disbelief_176420-19591.jpg?t=st=1723641040~exp=1723644640~hmac=aef27975e23ff9df20ea1f41d340106576264a0d6c9400a220ad615579e1340b&w=740',
+            uri: Auth.user?.photoURL || placeholderImage,
           }}
           style={styles.img}
         />
         <View style={{ gap: spacingY._7, marginTop: spacingY._5, alignItems: 'center' }}>
           <Typo size={22} style={styles.name}>
-            Jack Frost
+            {userName}
           </Typo>
           <Typo size={16} style={{ color: colors.gray, fontWeight: '500' }}>
-            jackfrost@gmail.com
+            {userEmail}
           </Typo>
         </View>
       </View>
@@ -109,7 +115,7 @@ function ProfileScreen(props) {
             iconColor={'#d1d1d1'}
             icon={<MaterialCommunityIcons name="logout" size={24} color={colors.black} />}
             index={5}
-            onPress={() => Auth.setUser(null)}
+            onPress={() => Auth.logout()}
           />
         </View>
       </View>

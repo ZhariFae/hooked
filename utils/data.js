@@ -3,134 +3,134 @@ const products = [
     url: require('../assets/products/item1.png'),
     name: 'Wireless Headphone',
     category: 'Electronics',
-    price: '$70.00',
+    price: '₱70.00',
   },
   {
     url: require('../assets/products/item2.png'),
     name: 'Smart Watch',
     category: 'Watches',
-    price: '$55.00',
+    price: '₱55.00',
   },
   {
     url: require('../assets/products/item3.png'),
     name: 'Mens Sweter',
     category: "Men's",
-    price: '$120.00',
+    price: '₱120.00',
   },
   {
     url: require('../assets/products/item4.png'),
     name: 'Wireless Headphone',
     category: 'Electronics',
-    price: '$70.00',
+    price: '₱70.00',
   },
   {
     url: require('../assets/products/item5.png'),
     name: 'Wireless Headphone',
     category: 'Electronics',
-    price: '$55.00',
+    price: '₱55.00',
   },
   {
     url: require('../assets/products/item6.png'),
     name: 'Air Buds',
     category: 'Electronics',
-    price: '$120.00',
+    price: '₱120.00',
   },
   {
     url: require('../assets/products/item7.png'),
     name: 'Air Buds',
     category: 'Electronics',
-    price: '$120.00',
+    price: '₱120.00',
   },
   {
     url: require('../assets/products/item8.png'),
     name: 'Smart Watch',
     category: 'Watches',
-    price: '$120.00',
+    price: '₱120.00',
   },
   {
     url: require('../assets/products/item9.png'),
     name: 'Mens Shirt',
     category: "Men's",
-    price: '$120.00',
+    price: '₱120.00',
   },
   {
     url: require('../assets/products/item10.png'),
     name: 'Wireless Headphone',
     category: 'Electronics',
-    price: '$120.00',
+    price: '₱120.00',
   },
 
   {
     url: require('../assets/products/item12.png'),
     name: 'Smart Watch',
     category: 'Watches',
-    price: '$120.00',
+    price: '₱120.00',
   },
   {
     url: require('../assets/products/item11.png'),
     name: 'Nike Shoes',
     category: 'Shoes',
-    price: '$120.00',
+    price: '₱120.00',
   },
   {
     url: require('../assets/products/item13.png'),
     name: 'Wireless Headphone',
     category: 'Shoes',
-    price: '$120.00',
+    price: '₱120.00',
   },
   {
     url: require('../assets/products/item14.png'),
     name: 'Jorden Shoes',
     category: 'Shoes',
-    price: '$120.00',
+    price: '₱120.00',
   },
   {
     url: require('../assets/products/item15.png'),
     name: 'Nike shoe',
     category: 'Shoes',
-    price: '$120.00',
+    price: '₱120.00',
   },
   {
     url: require('../assets/products/item16.png'),
     name: 'T Shirt',
     category: "Men's",
-    price: '$120.00',
+    price: '₱120.00',
   },
   {
     url: require('../assets/products/item17.png'),
     name: 'Mens Jacket',
     category: "Men's",
-    price: '$120.00',
+    price: '₱120.00',
   },
   {
     url: require('../assets/products/item18.png'),
     name: 'Mens Jacket',
     category: "Men's",
-    price: '$120.00',
+    price: '₱120.00',
   },
   {
     url: require('../assets/products/item19.png'),
     name: 'Mens Jacket',
     category: "Men's",
-    price: '$120.00',
+    price: '₱120.00',
   },
   {
     url: require('../assets/products/item20.png'),
     name: 'Mens Jacket',
     category: "Men's",
-    price: '$120.00',
+    price: '₱120.00',
   },
   {
     url: require('../assets/products/item21.png'),
     name: 'Mens Jacket',
     category: "Men's",
-    price: '$120.00',
+    price: '₱120.00',
   },
   {
     url: require('../assets/products/item22.png'),
     name: 'Mens Jacket',
     category: "Men's",
-    price: '$120.00',
+    price: '₱120.00',
   },
 ];
 
@@ -149,47 +149,38 @@ const categories = [
   },
   {
     image: require('../assets/categories/shoe.png'),
-    name: 'Shoes',
+    name: 'Accessories',
   },
   {
     image: require('../assets/categories/men.png'),
-    name: "Men's",
+    name: "Cardigans",
   },
   {
     image: require('../assets/categories/watch.png'),
-    name: 'Watches',
+    name: 'Costumes',
   },
   {
     image: require('../assets/categories/headphone.png'),
-    name: 'Electronics',
+    name: 'Keychain',
   },
   {
     image: require('../assets/categories/beauty.png'),
-    name: 'Beauty',
+    name: 'Phone Charm',
   },
   {
     image: require('../assets/categories/women.png'),
-    name: "Women's",
-  },
-  {
-    image: require('../assets/categories/jewelry.png'),
-    name: 'Jewelry',
-  },
+    name: "Stuffed Toys",
+  }
 ];
 
 const CATEGORIES = [
-  'T-shirts',
-  'Jackets',
-  'Shirts',
-  'Hoodies',
-  'Jumpers',
-  'Trousers',
-  'Jeans',
-  'Joggers',
-  'Vests',
-  'Sweatshirts',
-  'Socks',
-  'Shorts',
+  'Accessories',
+  'Cardigans',
+  'Costumes',
+  'Keychain',
+  'Phone Charm',
+  'Stuffed Toys'
+
 ];
 
 const STYLES = ['Regular', 'Oversized', 'Slim', 'Relaxed', 'Skinny', 'Muscie'];
@@ -207,6 +198,7 @@ const BRANDS = [
   'Asics',
   'Burberry',
 ];
+
 const COLORS = [
   'Blue',
   'Red',
