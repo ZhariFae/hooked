@@ -23,7 +23,12 @@ function HomeScreen({ navigation }) {
   const [selected, setSelected] = useState('All');
   const [allProducts, setAllProducts] = useState([]);
   const [data, setData] = useState([]);
+  const [maxProductPrice, setMaxProductPrice] = useState(1000); // Default max price
   const [favouriteIds, setFavouriteIds] = useState(new Set());
+  const [filters, setFilters] = useState({
+    categories: [],
+    priceRange: null,
+  });
   const [searchQuery, setSearchQuery] = useState('');
 
   const loadData = useCallback(async () => {
@@ -32,6 +37,12 @@ function HomeScreen({ navigation }) {
     const visibleProducts =
       user?.role === 'Admin' ? productList : productList.filter((p) => p.activate);
     setAllProducts(visibleProducts);
+
+    // Calculate max price from visible products
+    if (visibleProducts.length > 0) {
+      const maxPrice = Math.max(...visibleProducts.map((p) => p.price));
+      setMaxProductPrice(maxPrice);
+    }
 
     // Fetch favourites
     if (user) {
@@ -46,16 +57,34 @@ function HomeScreen({ navigation }) {
 
   useEffect(() => {
     let filteredProducts = allProducts;
-    if (selected !== 'All') {
+
+    // Apply filters from modal or the top category selector
+    // 1. Category filter
+    if (filters.categories && filters.categories.length > 0) {
+      // Use categories from the filter modal if they exist
+      filteredProducts = filteredProducts.filter((item) =>
+        filters.categories.includes(item.category)
+      );
+    } else if (selected !== 'All') {
+      // Otherwise, use the top category selector
       filteredProducts = filteredProducts.filter((item) => item.category === selected);
     }
+
+    // 2. Price range filter
+    if (filters.priceRange) {
+      filteredProducts = filteredProducts.filter(
+        (item) => item.price >= filters.priceRange.low && item.price <= filters.priceRange.high
+      );
+    }
+
+    // 3. Search query filter
     if (searchQuery) {
       filteredProducts = filteredProducts.filter((item) =>
         item.name.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
     setData(filteredProducts);
-  }, [searchQuery, selected, allProducts]);
+  }, [searchQuery, selected, allProducts, filters]);
 
   useFocusEffect(
     useCallback(() => {
@@ -76,6 +105,15 @@ function HomeScreen({ navigation }) {
 
   const handleFilter = (category) => {
     setSelected(category);
+    // Clear modal filters when a quick filter is selected for a clean state
+    setFilters({ categories: [], priceRange: null });
+  };
+
+  const handleApplyFilters = (newFilters) => {
+    setFilters(newFilters);
+    // If modal has category filters, reset the top selector to 'All'
+    if (newFilters.categories && newFilters.categories.length > 0)
+      setSelected('All');
   };
   return (
     <ScreenComponent style={styles.container}>
@@ -102,7 +140,7 @@ function HomeScreen({ navigation }) {
 
         <FlatList
           data={categories}
-          horizontal
+          horizontal 
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.catContainer}
           keyExtractor={(item, index) => index.toString()}
@@ -159,7 +197,12 @@ function HomeScreen({ navigation }) {
 
         {/* </ScrollView> */}
       </ScrollView>
-      <FilterModal visible={filterModalVisible} setVisible={setFilterModalVisible} />
+      <FilterModal
+        visible={filterModalVisible}
+        setVisible={setFilterModalVisible}
+        maxPrice={maxProductPrice}
+        onApplyFilters={handleApplyFilters}
+      />
     </ScreenComponent>
   );
 }

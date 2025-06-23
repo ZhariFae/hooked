@@ -4,6 +4,7 @@ import Typo from 'components/Typo';
 import colors from 'config/colors';
 import { radius, spacingX, spacingY } from 'config/spacing';
 import React, { useState } from 'react';
+import { useEffect } from 'react'; // Added useEffect
 import {
   View,
   StyleSheet,
@@ -18,10 +19,22 @@ import { CATEGORIES } from 'utils/data';
 import { normalizeY } from 'utils/normalize';
 const { height } = Dimensions.get('screen');
 
-function FilterModal({ visible, setVisible }) {
+function FilterModal({ visible, setVisible, maxPrice, onApplyFilters }) {
   const [selectedCategories, setSelectedCategories] = useState([]);
-  const [low, setLow] = useState(0);
-  const [high, setHigh] = useState(1000);
+  const defaultMaxPrice = 1000; // Define a default max price
+  const initialHigh = maxPrice > 0 ? maxPrice : defaultMaxPrice;
+
+  const [low, setLow] = useState(0); // Initialize low to 0
+  const [high, setHigh] = useState(initialHigh); // Initialize high with maxPrice or default
+
+  // Reset filters to default when modal becomes visible
+  useEffect(() => {
+    if (visible) {
+      setSelectedCategories([]);
+      setLow(0);
+      setHigh(maxPrice > 0 ? maxPrice : defaultMaxPrice);
+    }
+  }, [visible]);
 
   const handleSelectCategories = (name) => {
     if (selectedCategories.includes(name)) {
@@ -30,6 +43,24 @@ function FilterModal({ visible, setVisible }) {
     } else {
       setSelectedCategories([...selectedCategories, name]);
     }
+  };
+
+  const handleApply = () => {
+    onApplyFilters({
+      categories: selectedCategories,
+      priceRange: { low, high },
+    });
+    setVisible(false);
+  };
+
+  const handleReset = () => {
+    // Reset local state
+    setSelectedCategories([]);
+    setLow(0);
+    setHigh(maxPrice > 0 ? maxPrice : defaultMaxPrice);
+    // Apply reset to home screen and close modal
+    onApplyFilters({ categories: [], priceRange: null });
+    setVisible(false);
   };
 
   return (
@@ -89,15 +120,15 @@ function FilterModal({ visible, setVisible }) {
             <Heading title={'Price Range'} index={2} />
             <View>
               <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                <Typo>${low}</Typo>
-                <Typo>${high}</Typo>
+                <Typo>₱{low}</Typo>
+                <Typo>₱{high}</Typo>
               </View>
             </View>
             <Slider
               minimumTrackTintColor={colors.themeColor}
               maximumTrackTintColor={colors.lightGray}
-              minimumValue={0}
-              maximumValue={100}
+              minimumValue={0} // Always start from 0
+              maximumValue={maxPrice > 0 ? maxPrice : defaultMaxPrice} // Use dynamic maxPrice
               thumbTintColor={colors.themeColor}
               trackStyle={{ backgroundColor: colors.lightGray }}
               value={[low, high]}
@@ -107,13 +138,13 @@ function FilterModal({ visible, setVisible }) {
               }}
             />
             <View style={styles.footer}>
-              <TouchableOpacity onPress={() => setVisible(false)} style={[styles.footerButton]}>
+              <TouchableOpacity onPress={handleApply} style={[styles.footerButton]}>
                 <Typo size={13} style={{ color: colors.white, fontWeight: '600' }}>
-                  Show 32 Results
+                  Show Results
                 </Typo>
               </TouchableOpacity>
               <TouchableOpacity
-                onPress={() => setVisible(false)}
+                onPress={handleReset}
                 style={[styles.footerButton, { backgroundColor: colors.lighterGray }]}>
                 <Typo size={13} style={{ color: colors.black, fontWeight: '600' }}>
                   Reset
