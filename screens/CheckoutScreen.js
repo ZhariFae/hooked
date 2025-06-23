@@ -1,3 +1,4 @@
+// CheckoutScreen.js
 import { MaterialIcons } from '@expo/vector-icons';
 import AppButton from 'components/AppButton';
 import Header from 'components/Header';
@@ -6,16 +7,39 @@ import Typo from 'components/Typo';
 import colors from 'config/colors';
 import { height, radius, spacingX, spacingY } from 'config/spacing';
 import React, { useState } from 'react';
-import { View, StyleSheet, TouchableOpacity, ScrollView, Image } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, ScrollView, Image, Modal } from 'react-native'; // <-- Import Modal
 import { normalizeX, normalizeY } from 'utils/normalize';
+
+// Import the new GCash QR modal content component
+import GCashQrModalContent from 'components/GCashQrModalContent'; // <-- Adjust this path if 'components' is not directly under your project root
 
 function CheckoutScreen({ route }) {
   const { cartTotal } = route.params;
-  const [selectedMethod, setSelectedMethod] = useState('Credit Card');
+  const [selectedMethod, setSelectedMethod] = useState('GCash'); // Set default to GCash for testing
   const [selectedAddress, setSelectedAddress] = useState('Home');
+  const [showQrModal, setShowQrModal] = useState(false); // <-- State to control modal visibility
+
   const shippingFee = 30.0;
   const subtotal = cartTotal;
   const finalTotal = subtotal + shippingFee;
+
+  /**
+   * Handles the press event on the "Payment" button.
+   * If GCash is selected, it opens the QR code modal.
+   * Otherwise, it can handle other payment methods (e.g., alert for now).
+   */
+  const handlePaymentPress = () => {
+    if (selectedMethod === 'GCash') {
+      setShowQrModal(true); // Open the QR modal
+    } else {
+      // In a real app, you would handle other payment methods here,
+      // e.g., navigate to a credit card form or process the payment directly.
+      // For this example, we'll just show an alert.
+      // Remember: Avoid using native alert() in production apps, use a custom modal for messages.
+      alert('Currently, only GCash payment is supported in this demo.');
+    }
+  };
+
   return (
     <ScreenComponent style={styles.container}>
       <Header label={'Checkout'} />
@@ -48,8 +72,9 @@ function CheckoutScreen({ route }) {
           title={'GCash'}
           selected={selectedMethod}
           setSelected={setSelectedMethod}
-          img={require('../assets/gcash.png')}
+          img={require('../assets/gcash.png')} // Ensure this path is correct
         />
+        {/* You can add other payment methods here later */}
       </ScrollView>
 
       <View style={styles.checkoutContainer}>
@@ -58,18 +83,41 @@ function CheckoutScreen({ route }) {
         <Row title={'Subtotal'} price={`₱${subtotal.toFixed(2)}`} />
         <View style={styles.separator} />
         <Row title={'Total'} price={`₱${finalTotal.toFixed(2)}`} />
-        <AppButton label={'Payment'} />
+        <AppButton
+          label={'Payment'}
+          onPress={handlePaymentPress} // <-- Assign the new handler to onPress
+        />
       </View>
+
+      {/* The Modal Component */}
+      <Modal
+        animationType="fade" // Or "slide" for a different effect
+        transparent={true} // Makes the background behind the modal transparent
+        visible={showQrModal} // Controls modal visibility based on state
+        onRequestClose={() => {
+          // This is for Android's hardware back button.
+          // It's good practice to allow closing the modal this way.
+          setShowQrModal(!showQrModal);
+        }}>
+        {/* This View creates the dimmed background effect and centers the modal content */}
+        <View style={styles.centeredView}>
+          <GCashQrModalContent
+            totalAmount={finalTotal} // Pass the total amount to the modal
+            onClose={() => setShowQrModal(false)} // Pass a function to close the modal
+          />
+        </View>
+      </Modal>
     </ScreenComponent>
   );
 }
 
+// Re-using your existing helper components
 const Row = ({ title, price }) => {
   return (
     <View style={styles.row}>
       <Typo
         size={15}
-        style={{ color: title == 'Total' ? colors.black : colors.gray, fontWeight: '500' }}>
+        style={{ color: title === 'Total' ? colors.black : colors.gray, fontWeight: '500' }}>
         {title}
       </Typo>
       <Typo size={18} style={{ fontWeight: '600' }}>
@@ -80,7 +128,7 @@ const Row = ({ title, price }) => {
 };
 
 const MethodRow = ({ title, img, selected, setSelected }) => {
-  const isSelected = selected == title;
+  const isSelected = selected === title; // Use strict equality
   return (
     <TouchableOpacity style={styles.row} onPress={() => setSelected(title)}>
       <View style={styles.methodImgBg}>
@@ -103,7 +151,7 @@ const MethodRow = ({ title, img, selected, setSelected }) => {
 };
 
 const AddressCard = ({ title, selected, setSelected, address, phone }) => {
-  const isSelected = selected == title;
+  const isSelected = selected === title; // Use strict equality
   return (
     <TouchableOpacity
       style={isSelected ? styles.selectedCard : styles.unSelectedCard}
@@ -130,7 +178,7 @@ const AddressCard = ({ title, selected, setSelected, address, phone }) => {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: 'grayBG',
+    backgroundColor: colors.grayBG, // Changed from string 'grayBG' to colors.grayBG
   },
   checkoutContainer: {
     borderTopLeftRadius: radius._20,
@@ -205,5 +253,13 @@ const styles = StyleSheet.create({
     borderRadius: radius._20,
     marginBottom: spacingY._20,
   },
+  // New style for the modal overlay and centering
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)', // Semi-transparent dark background
+  },
 });
+
 export default CheckoutScreen;
