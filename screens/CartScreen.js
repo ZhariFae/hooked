@@ -149,7 +149,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   discountRow: {
-    // This style is no longer used but kept for completeness based on original code structure.
     height: height.input,
     backgroundColor: colors.grayBG,
     width: '100%',
@@ -160,13 +159,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   input: {
-    // This style is no longer used.
+
     fontSize: normalizeY(16),
     flex: 1,
     paddingRight: spacingX._10,
   },
   applyText: {
-    // This style is no longer used.
     fontSize: normalizeY(18),
     color: colors.primary,
     fontWeight: '600',
