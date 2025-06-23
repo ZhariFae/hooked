@@ -1,4 +1,3 @@
-// CheckoutScreen.js
 import { MaterialIcons } from '@expo/vector-icons';
 import AppButton from 'components/AppButton';
 import Header from 'components/Header';
@@ -7,36 +6,67 @@ import Typo from 'components/Typo';
 import colors from 'config/colors';
 import { height, radius, spacingX, spacingY } from 'config/spacing';
 import React, { useState } from 'react';
-import { View, StyleSheet, TouchableOpacity, ScrollView, Image, Modal } from 'react-native'; // <-- Import Modal
+import {
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+  Image,
+  Modal,
+  TextInput,
+  Alert,
+} from 'react-native';
 import { normalizeX, normalizeY } from 'utils/normalize';
-
-// Import the new GCash QR modal content component
-import GCashQrModalContent from 'components/GCashQrModalContent'; // <-- Adjust this path if 'components' is not directly under your project root
+import useAuth from 'auth/useAuth';
+import { useCallback } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
+import { addUserAddress, getUserAddresses } from 'services/userDataService';
 
 function CheckoutScreen({ route }) {
   const { cartTotal } = route.params;
-  const [selectedMethod, setSelectedMethod] = useState('GCash'); // Set default to GCash for testing
-  const [selectedAddress, setSelectedAddress] = useState('Home');
-  const [showQrModal, setShowQrModal] = useState(false); // <-- State to control modal visibility
+  const { user } = useAuth();
+  const [selectedMethod, setSelectedMethod] = useState('GCash');
+  const [addresses, setAddresses] = useState([]);
+  const [selectedAddress, setSelectedAddress] = useState(null);
+  const [isAddressModalVisible, setAddressModalVisible] = useState(false);
+  const [newAddress, setNewAddress] = useState({ title: '', phone: '', address: '' });
 
   const shippingFee = 30.0;
   const subtotal = cartTotal;
   const finalTotal = subtotal + shippingFee;
 
-  /**
-   * Handles the press event on the "Payment" button.
-   * If GCash is selected, it opens the QR code modal.
-   * Otherwise, it can handle other payment methods (e.g., alert for now).
-   */
-  const handlePaymentPress = () => {
-    if (selectedMethod === 'GCash') {
-      setShowQrModal(true); // Open the QR modal
-    } else {
-      // In a real app, you would handle other payment methods here,
-      // e.g., navigate to a credit card form or process the payment directly.
-      // For this example, we'll just show an alert.
-      // Remember: Avoid using native alert() in production apps, use a custom modal for messages.
-      alert('Currently, only GCash payment is supported in this demo.');
+  const loadAddresses = useCallback(async () => {
+    if (user) {
+      const userAddresses = await getUserAddresses(user.uid);
+      setAddresses(userAddresses);
+      if (userAddresses.length > 0) {
+        setSelectedAddress(userAddresses[0].id); // Select the first address by default
+      } else {
+        // If no addresses, prompt to add one
+        setAddressModalVisible(true);
+      }
+    }
+  }, [user]);
+
+  useFocusEffect(
+    useCallback(() => {
+      loadAddresses();
+    }, [loadAddresses])
+  );
+
+  const handleAddAddress = async () => {
+    if (!newAddress.title || !newAddress.phone || !newAddress.address) {
+      Alert.alert('Incomplete Form', 'Please fill out all address fields.');
+      return;
+    }
+    try {
+      await addUserAddress(user.uid, newAddress);
+      Alert.alert('Success', 'Address added successfully.');
+      setAddressModalVisible(false);
+      setNewAddress({ title: '', phone: '', address: '' }); // Reset form
+      loadAddresses(); // Refresh addresses
+    } catch (error) {
+      Alert.alert('Error', 'Failed to add address.');
     }
   };
 
@@ -50,20 +80,24 @@ function CheckoutScreen({ route }) {
         <Typo size={18} style={{ fontWeight: '600', marginBottom: spacingY._15 }}>
           Shipping to
         </Typo>
-        <AddressCard
-          selected={selectedAddress}
-          setSelected={setSelectedAddress}
-          title="Home"
-          phone="(+63) 123 456 7890"
-          address="123 Salcedo Street, Makati City"
-        />
-        <AddressCard
-          selected={selectedAddress}
-          setSelected={setSelectedAddress}
-          title="Office"
-          phone="(+63) 123 456 7890"
-          address="123 Ayala Avenue, Makati City"
-        />
+        {addresses.map((addr) => (
+          <AddressCard
+            key={addr.id}
+            id={addr.id}
+            selected={selectedAddress}
+            setSelected={setSelectedAddress}
+            title={addr.title}
+            phone={addr.phone}
+            address={addr.address}
+          />
+        ))}
+
+        <TouchableOpacity
+          style={styles.addAddressButton}
+          onPress={() => setAddressModalVisible(true)}>
+          <MaterialIcons name="add-circle-outline" size={24} color={colors.primary} />
+          <Typo style={{ color: colors.primary, fontWeight: '600' }}>Add New Address</Typo>
+        </TouchableOpacity>
 
         <Typo size={18} style={{ fontWeight: '600' }}>
           Payment method
@@ -72,9 +106,8 @@ function CheckoutScreen({ route }) {
           title={'GCash'}
           selected={selectedMethod}
           setSelected={setSelectedMethod}
-          img={require('../assets/gcash.png')} // Ensure this path is correct
+          img={require('../assets/gcash.png')}
         />
-        {/* You can add other payment methods here later */}
       </ScrollView>
 
       <View style={styles.checkoutContainer}>
@@ -83,41 +116,65 @@ function CheckoutScreen({ route }) {
         <Row title={'Subtotal'} price={`₱${subtotal.toFixed(2)}`} />
         <View style={styles.separator} />
         <Row title={'Total'} price={`₱${finalTotal.toFixed(2)}`} />
-        <AppButton
-          label={'Payment'}
-          onPress={handlePaymentPress} // <-- Assign the new handler to onPress
-        />
+        <AppButton label={'Payment'} disabled={!selectedAddress} />
       </View>
-
-      {/* The Modal Component */}
-      <Modal
-        animationType="fade" // Or "slide" for a different effect
-        transparent={true} // Makes the background behind the modal transparent
-        visible={showQrModal} // Controls modal visibility based on state
-        onRequestClose={() => {
-          // This is for Android's hardware back button.
-          // It's good practice to allow closing the modal this way.
-          setShowQrModal(!showQrModal);
-        }}>
-        {/* This View creates the dimmed background effect and centers the modal content */}
-        <View style={styles.centeredView}>
-          <GCashQrModalContent
-            totalAmount={finalTotal} // Pass the total amount to the modal
-            onClose={() => setShowQrModal(false)} // Pass a function to close the modal
-          />
-        </View>
-      </Modal>
+      <AddressModal
+        visible={isAddressModalVisible}
+        onClose={() => setAddressModalVisible(false)}
+        onSave={handleAddAddress}
+        address={newAddress}
+        setAddress={setNewAddress}
+      />
     </ScreenComponent>
   );
 }
 
-// Re-using your existing helper components
+const AddressModal = ({ visible, onClose, onSave, address, setAddress }) => (
+  <Modal visible={visible} transparent={true} animationType="slide" onRequestClose={onClose}>
+    <View style={styles.modalContainer}>
+      <View style={styles.modalContent}>
+        <Typo size={18} style={{ fontWeight: '600', marginBottom: spacingY._20 }}>
+          Add New Address
+        </Typo>
+        <TextInput
+          style={styles.input}
+          placeholder="Title (e.g., Home, Office)"
+          value={address.title}
+          onChangeText={(text) => setAddress({ ...address, title: text })}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Phone Number"
+          value={address.phone}
+          onChangeText={(text) => setAddress({ ...address, phone: text })}
+          keyboardType="phone-pad"
+        />
+        <TextInput
+          style={[styles.input, { height: 100, textAlignVertical: 'top' }]}
+          placeholder="Full Address"
+          value={address.address}
+          onChangeText={(text) => setAddress({ ...address, address: text })}
+          multiline
+        />
+        <View style={styles.modalButtons}>
+          <TouchableOpacity onPress={onClose} style={styles.modalButton}>
+            <Typo>Cancel</Typo>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={onSave} style={[styles.modalButton, styles.saveButton]}>
+            <Typo style={{ color: colors.white }}>Save</Typo>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </View>
+  </Modal>
+);
+
 const Row = ({ title, price }) => {
   return (
     <View style={styles.row}>
       <Typo
         size={15}
-        style={{ color: title === 'Total' ? colors.black : colors.gray, fontWeight: '500' }}>
+        style={{ color: title == 'Total' ? colors.black : colors.gray, fontWeight: '500' }}>
         {title}
       </Typo>
       <Typo size={18} style={{ fontWeight: '600' }}>
@@ -128,7 +185,7 @@ const Row = ({ title, price }) => {
 };
 
 const MethodRow = ({ title, img, selected, setSelected }) => {
-  const isSelected = selected === title; // Use strict equality
+  const isSelected = selected == title;
   return (
     <TouchableOpacity style={styles.row} onPress={() => setSelected(title)}>
       <View style={styles.methodImgBg}>
@@ -150,12 +207,12 @@ const MethodRow = ({ title, img, selected, setSelected }) => {
   );
 };
 
-const AddressCard = ({ title, selected, setSelected, address, phone }) => {
-  const isSelected = selected === title; // Use strict equality
+const AddressCard = ({ id, title, selected, setSelected, address, phone }) => {
+  const isSelected = selected == id;
   return (
     <TouchableOpacity
       style={isSelected ? styles.selectedCard : styles.unSelectedCard}
-      onPress={() => setSelected(title)}>
+      onPress={() => setSelected(id)}>
       <View
         style={[styles.dotRadius, { borderColor: isSelected ? colors.primary : colors.lightGray }]}>
         {isSelected && <View style={styles.dot} />}
@@ -178,7 +235,7 @@ const AddressCard = ({ title, selected, setSelected, address, phone }) => {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: colors.grayBG, // Changed from string 'grayBG' to colors.grayBG
+    backgroundColor: 'grayBG',
   },
   checkoutContainer: {
     borderTopLeftRadius: radius._20,
@@ -253,13 +310,53 @@ const styles = StyleSheet.create({
     borderRadius: radius._20,
     marginBottom: spacingY._20,
   },
-  // New style for the modal overlay and centering
-  centeredView: {
+  addAddressButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacingX._10,
+    padding: spacingY._15,
+    borderWidth: 1,
+    borderColor: colors.primary,
+    borderStyle: 'dashed',
+    borderRadius: radius._20,
+    marginBottom: spacingY._20,
+  },
+  modalContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.5)', // Semi-transparent dark background
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  modalContent: {
+    width: '90%',
+    backgroundColor: colors.white,
+    borderRadius: radius._20,
+    padding: spacingX._20,
+    alignItems: 'center',
+  },
+  input: {
+    width: '100%',
+    backgroundColor: colors.grayBG,
+    borderRadius: radius._10,
+    paddingHorizontal: spacingX._15,
+    paddingVertical: spacingY._12,
+    fontSize: normalizeY(16),
+    marginBottom: spacingY._15,
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    width: '100%',
+    marginTop: spacingY._10,
+  },
+  modalButton: {
+    paddingVertical: spacingY._10,
+    paddingHorizontal: spacingX._20,
+    borderRadius: radius._10,
+  },
+  saveButton: {
+    backgroundColor: colors.primary,
   },
 });
-
 export default CheckoutScreen;

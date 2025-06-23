@@ -1,4 +1,5 @@
 import {
+  addDoc,
   collection,
   deleteDoc,
   doc,
@@ -101,4 +102,35 @@ export const updateCartItemQuantity = async (userId, productId, newQuantity) => 
     // If quantity is 0 or less, remove the item
     await deleteDoc(cartItemRef);
   }
+};
+
+// User Addresses
+
+/**
+ * Adds a new address for a user.
+ * @param {string} userId - The ID of the user.
+ * @param {object} addressData - The address data (e.g., { title, phone, address }).
+ * @returns {Promise<string>} The ID of the new address document.
+ */
+export const addUserAddress = async (userId, addressData) => {
+  try {
+    const addressesColRef = collection(db, 'users', userId, 'addresses');
+    const newAddressRef = await addDoc(addressesColRef, addressData);
+    return newAddressRef.id;
+  } catch (error) {
+    console.error('Error adding user address:', error);
+    throw error;
+  }
+};
+
+/**
+ * Fetches all addresses for a given user.
+ * @param {string} userId - The ID of the user.
+ * @returns {Promise<Array<object>>} An array of address objects, each with an id.
+ */
+export const getUserAddresses = async (userId) => {
+  if (!userId) return [];
+  const addressesColRef = collection(db, 'users', userId, 'addresses');
+  const addressSnapshot = await getDocs(addressesColRef);
+  return addressSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 };
