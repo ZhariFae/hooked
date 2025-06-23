@@ -31,17 +31,17 @@ function RegisterScreen(props) {
   const [password, setPassword] = useState('');
   const [isSecure, setIsSecure] = useState(true);
 
-  const handleRegister = async() => {
+  const handleRegister = async () => {
     if (!name || !email || !password) {
-      Alert.alert('Error', 'Name, email, and password are required.')
+      Alert.alert('Error', 'Name, email, and password are required.');
       return;
     }
-    try{
+    try {
       await Auth.signup(name, email, password);
-    }catch (error){
+    } catch (error) {
       Alert.alert('Registration Failed.', error.message);
     }
-  }
+  };
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.background}>
@@ -62,12 +62,7 @@ function RegisterScreen(props) {
           </Typo>
         </View>
         <View style={styles.inputView}>
-          <TextInput
-            value={name}
-            onChangeText={setName}
-            placeholder="Name"
-            style={styles.input}
-          />
+          <TextInput value={name} onChangeText={setName} placeholder="Name" style={styles.input} />
         </View>
         <View style={styles.inputView}>
           <TextInput

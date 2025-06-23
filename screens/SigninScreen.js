@@ -31,16 +31,16 @@ function SigninScreen(props) {
   const [isSecure, setIsSecure] = useState(true);
 
   const handleSignIn = async () => {
-    if (!email || !password){
-      Alert.alert('Error', 'Please enter your email and password.')
+    if (!email || !password) {
+      Alert.alert('Error', 'Please enter your email and password.');
       return;
     }
     try {
       await Auth.login(email, password);
-    } catch(error){
+    } catch (error) {
       Alert.alert('Sign In Failed ', error.message);
     }
-  }
+  };
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.background}>
@@ -87,7 +87,7 @@ function SigninScreen(props) {
             </TouchableOpacity>
           )}
         </View>
-        <Typo style={styles.recoverTxt}>Recover Password</Typo>
+        {/* <Typo style={styles.recoverTxt}>Recover Password</Typo> */}
         <AppButton
           onPress={handleSignIn}
           label={Auth.loading ? <ActivityIndicator color={colors.white} /> : 'Sign in'}
