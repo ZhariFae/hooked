@@ -14,14 +14,14 @@ function StartScreen(props) {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.background}>
-        <View style={[styles.c1, { opacity: 0.5 }]} />
+        <View style={[styles.c1, { opacity: 0.3 }]} />
         <View
           style={[
             styles.orangeCircle,
-            { bottom: '40%', left: '5%', opacity: 0.5, width: width / 1.1 },
+            { bottom: '40%', left: '5%', opacity: 0.2, width: width / 1.1 },
           ]}
         />
-        <View style={[styles.orangeCircle, { opacity: 0.4 }]} />
+        <View style={[styles.orangeCircle, { opacity: 0.2 }]} />
         <View style={styles.c2} />
       </View>
       <BlurView intensity={100} tint="light" style={styles.blurContainer}>
@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
     height: width * 0.6,
     borderRadius: width * 0.3,
     backgroundColor: '#D4C7AE',
-    opacity: 0.7,
+    opacity: 0.4,
     position: 'absolute',
     bottom: height * 0.2,
     right: -width * 0.1,
