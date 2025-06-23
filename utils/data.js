@@ -151,27 +151,27 @@ const categories = [
     name: 'All',
   },
   {
-    image: require('../assets/categories/shoe.png'),
+    image: require('../assets/categories/accessories.png'),
     name: 'Accessories',
   },
   {
-    image: require('../assets/categories/men.png'),
+    image: require('../assets/categories/cardigans.png'),
     name: "Cardigans",
   },
   {
-    image: require('../assets/categories/watch.png'),
+    image: require('../assets/categories/costumes.png'),
     name: 'Costumes',
   },
   {
-    image: require('../assets/categories/headphone.png'),
+    image: require('../assets/categories/keychain.png'),
     name: 'Keychain',
   },
   {
-    image: require('../assets/categories/beauty.png'),
+    image: require('../assets/categories/phone charm.png'),
     name: 'Phone Charm',
   },
   {
-    image: require('../assets/categories/women.png'),
+    image: require('../assets/categories/stuffed toys.png'),
     name: "Stuffed Toys",
   }
 ];
