@@ -57,26 +57,34 @@ function CartScreen({ navigation }) {
   return (
     <ScreenComponent style={styles.container}>
       <Header label={'My Cart'} />
-      <FlatList
-        data={products}
-        style={{ flex: 1 }}
-        keyExtractor={(item) => item.id.toString()}
-        contentContainerStyle={styles.listContainer}
-        renderItem={({ item, index }) => {
-          return (
-            <Animated.View
-              entering={FadeInDown.delay(index * 140)
-                .duration(2000)
-                .damping(12)
-                .springify()}>
-              <CartCard
-                item={item}
-                onQuantityChange={(newQuantity) => handleQuantityChange(item.id, newQuantity)}
-              />
-            </Animated.View>
-          );
-        }}
-      />
+      {/* Conditional rendering for empty cart message */}
+      {products.length === 0 ? (
+        <View style={styles.emptyCartContainer}>
+          <Text style={styles.emptyCartText}>Your basket of yarn is empty!</Text>
+          <Text style={styles.emptyCartSubText}>Time to cast on some delightful finds.</Text>
+        </View>
+      ) : (
+        <FlatList
+          data={products}
+          style={{ flex: 1 }}
+          keyExtractor={(item) => item.id.toString()}
+          contentContainerStyle={styles.listContainer}
+          renderItem={({ item, index }) => {
+            return (
+              <Animated.View
+                entering={FadeInDown.delay(index * 140)
+                  .duration(2000)
+                  .damping(12)
+                  .springify()}>
+                <CartCard
+                  item={item}
+                  onQuantityChange={(newQuantity) => handleQuantityChange(item.id, newQuantity)}
+                />
+              </Animated.View>
+            );
+          }}
+        />
+      )}
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={{
@@ -92,10 +100,12 @@ function CartScreen({ navigation }) {
           <Row title={'Subtotal'} price={`₱${total.toFixed(2)}`} />
           <View style={styles.separator} />
           <Row title={'Total'} price={`₱${total.toFixed(2)}`} />
-          <AppButton label={'Checkout'} onPress={() => navigation.navigate('Checkout', { cartTotal: total })} />
+          <AppButton
+            label={'Checkout'}
+            onPress={() => navigation.navigate('Checkout', { cartTotal: total })}
+          />
         </View>
       </KeyboardAvoidingView>
-      {/* <View style={{ height: '12%', backgroundColor: colors.white }} /> */}
     </ScreenComponent>
   );
 }
@@ -122,6 +132,24 @@ const styles = StyleSheet.create({
   listContainer: {
     paddingHorizontal: spacingX._20,
     paddingTop: spacingY._15,
+  },
+  emptyCartContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: spacingX._20,
+  },
+  emptyCartText: {
+    fontSize: normalizeY(22),
+    fontWeight: 'bold',
+    color: colors.gray,
+    textAlign: 'center',
+    marginBottom: spacingY._5,
+  },
+  emptyCartSubText: {
+    fontSize: normalizeY(16),
+    color: colors.gray,
+    textAlign: 'center',
   },
   discountRow: {
     height: height.input,
