@@ -6,7 +6,7 @@ export default {
   blue: '#327ad6',
   darkGray: '#38434D',
   purple: '#6366F1',
-  primary: '#a4ac86',
+  primary: '#656d4a',
   lightPrimary: 'rgba(255, 102, 14, 0.1)',
   light: '#f8e8df',
   grayBG: '#f5f5f5',
