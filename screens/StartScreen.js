@@ -31,17 +31,17 @@ function StartScreen(props) {
         <View>
           <Animated.View entering={FadeInDown.delay(100).duration(500).springify().damping(12)}>
             <Typo size={26} style={styles.text}>
-              Discover Your
+              Threads of Passion
             </Typo>
             <Typo size={26} style={styles.text}>
-              Best Products Here
+              Stitched Just for You
             </Typo>
           </Animated.View>
           <Animated.View entering={FadeInDown.delay(200).duration(500).springify().damping(12)}>
             <Typo style={[styles.body, { marginTop: '5%' }]}>
-              Explore all the most exiting best products
+              Discover handmade magic in every loop
             </Typo>
-            <Typo style={styles.body}>based on your interest and needs here</Typo>
+            <Typo style={styles.body}>or commission a dream woven in yarn.</Typo>
           </Animated.View>
         </View>
         <StartSelector selected={selected} setSelected={setSelected} />
