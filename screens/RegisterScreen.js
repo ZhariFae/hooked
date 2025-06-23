@@ -51,21 +51,21 @@ function RegisterScreen(props) {
       </View>
       <BlurView intensity={100} tint="light" style={styles.blurContainer}>
         <Typo size={26} style={styles.text}>
-          Hello There!
+          Hello, yarn lover!
         </Typo>
         <View style={{ marginVertical: '5%' }}>
           <Typo size={20} style={styles.body}>
-            Join Us to Unlock a World
+            Become a part of a world
           </Typo>
           <Typo size={20} style={styles.body}>
-            of Shopping Delights!
+            where every stitch tells a story.
           </Typo>
         </View>
         <View style={styles.inputView}>
           <TextInput
             value={name}
             onChangeText={setName}
-            placeholder="Enter name"
+            placeholder="Name"
             style={styles.input}
           />
         </View>
@@ -73,7 +73,7 @@ function RegisterScreen(props) {
           <TextInput
             value={email}
             onChangeText={setEmail}
-            placeholder="Enter email"
+            placeholder="Email"
             style={styles.input}
           />
         </View>
@@ -119,7 +119,7 @@ function RegisterScreen(props) {
           style={[styles.orContinueRow, { gap: spacingX._5, marginTop: '15%' }]}
           onPress={() => navigation.navigate('Signin')}>
           <Typo>Already a memeber?</Typo>
-          <Typo style={{ color: colors.blue }}>Signin</Typo>
+          <Typo style={{ color: colors.blue }}>Sign In</Typo>
         </TouchableOpacity>
       </BlurView>
     </SafeAreaView>
