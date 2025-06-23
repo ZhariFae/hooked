@@ -75,7 +75,7 @@ function ItemDetailsScreen({ route, navigation }) {
             ₱ {item.price}
           </Typo>
           <Typo size={16} style={styles.seller}>
-            Seller: Syed Noman
+            Seller: Aliyah Picazo
           </Typo>
           <View style={styles.ratingRow}>
             <View style={styles.ratingView}>
@@ -84,34 +84,34 @@ function ItemDetailsScreen({ route, navigation }) {
                 4.8
               </Typo>
             </View>
-            <Typo style={{ color: colors.gray }}> (320 Review)</Typo>
+            <Typo style={{ color: colors.gray }}> (1 Review)</Typo>
           </View>
           <DetailsSelector selected={selected} setSelected={setSelected} />
           {selected == 'Description' ? (
             <Typo style={{ color: colors.gray }}>
-              Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum
-              has been the industry's standard dummy text ever since the 1500s, when an unknown
-              printer took a galley of type and scrambled it to make a type specimen book. It has
-              survived not only five centuries, but also the leap into electronic typesetting,
-              remaining essentially unchanged. It was popularised in the 1960s with the release of
-              Letraset sheets containing Lorem Ipsum passages, and more recently with desktop
-              publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
+              incididunt ut labore et dolore magna aliqua. Inceptos imperdiet turpis erat odio augue
+              molestie etiam est. Vitae lacus venenatis hendrerit velit tincidunt. Volutpat congue
+              fames habitant litora consectetur ex torquent semper semper interdum mauris cras. Sem
+              class ipsum sem maximus habitasse iaculis vestibulum. Lacinia per nisl facilisis dolor
+              non ante conubia fringilla libero nam phasellus feugiat lacus turpis.
             </Typo>
           ) : (
             <Typo style={{ color: colors.gray }}>
-              The art of communication has evolved over centuries, yet the essence of conveying
-              ideas remains timeless. Throughout history, language has served as a vessel for
-              knowledge, culture, and expression. From the ancient scrolls of the scholars to the
-              printed manuscripts of the Renaissance, the written word has been a cornerstone of
-              human civilization. In the modern era, despite the advent of digital media, the
-              fundamental principles of writing have endured. Whether through the pages of a
-              well-worn book or the pixels on a screen, the power of words
+              Molestie suspendisse dignissim venenatis condimentum maecenas erat at aliquet turpis.
+              Dictumst arcu tristique ipsum dolor ac porta nulla enim leo sed primis lectus. Pretium
+              habitasse ligula rhoncus hendrerit nec. Arcu cubilia iaculis mauris at tristique
+              fermentum ligula ipsum nunc tempor augue sapien habitasse. At vitae curae est per
+              vitae velit gravida vivamus sodales tempus leo varius purus.
             </Typo>
           )}
         </ScrollView>
         <View style={styles.buttonContainer}>
           <View style={styles.countView}>
-            <Typo onPress={() => setQuantity(Math.max(1, quantity - 1))} size={20} style={styles.count}>
+            <Typo
+              onPress={() => setQuantity(Math.max(1, quantity - 1))}
+              size={20}
+              style={styles.count}>
               -
             </Typo>
             <Typo size={20} style={styles.count}>
