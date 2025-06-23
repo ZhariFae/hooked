@@ -52,9 +52,9 @@ function CartScreen({ navigation }) {
             <TextInput style={styles.input} placeholder="Enter Discount Code" />
             <Text style={styles.applyText}>Apply</Text>
           </View>
-          <Row title={'Subtotal'} price={'$245.00'} />
+          <Row title={'Subtotal'} price={'₱245.00'} />
           <View style={styles.separator} />
-          <Row title={'Total'} price={'$245.00'} />
+          <Row title={'Total'} price={'₱245.00'} />
           <AppButton label={'Checkout'} onPress={() => navigation.navigate('Checkout')} />
         </View>
       </KeyboardAvoidingView>

@@ -17,7 +17,7 @@ function FavouriteCard({ item }) {
       onPress={() => navigation.navigate('ItemDetails', item)}>
       <View style={styles.imgContainer}>
         <Image
-          source={item.url}
+          source={{ uri: item.pictureUrl }}
           resizeMode="contain"
           style={{
             width: imgSize,
@@ -33,7 +33,7 @@ function FavouriteCard({ item }) {
           <MaterialIcons name="delete-outline" size={normalizeY(24)} color={colors.primary} />
         </View>
         <Typo style={styles.catText}>{item.category}</Typo>
-        <Typo style={{ fontWeight: 'bold' }}>{item.price}</Typo>
+        <Typo style={{ fontWeight: 'bold' }}>₱ {item.price}</Typo>
       </View>
     </TouchableOpacity>
   );

@@ -9,16 +9,17 @@ import Typo from 'components/Typo';
 import colors from 'config/colors';
 import { radius, spacingX, spacingY } from 'config/spacing';
 import FilterModal from 'model/FilterModal';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import { View, StyleSheet, FlatList, ScrollView, Image, TouchableOpacity } from 'react-native';
 import Animated, { FadeInDown, FadeInRight } from 'react-native-reanimated';
-import { products, categories } from 'utils/data';
+import { products as fetchProducts, categories } from 'utils/data';
 import { normalizeX, normalizeY } from 'utils/normalize';
 
 function HomeScreen({ navigation }) {
   const [filterModalVisible, setFilterModalVisible] = useState(false);
   const [selected, setSelected] = useState('All');
-  const [data, setData] = useState(products);
+    const [allProducts, setAllProducts] = useState([]);
+  const [data, setData] = useState([]);
   const [key, setKey] = useState(0);
 
   // useFocusEffect(
@@ -27,14 +28,23 @@ function HomeScreen({ navigation }) {
   //   }, [])
   // );
 
+  useEffect(() => {
+    const loadProducts = async () => {
+      const productList = await fetchProducts();
+      setAllProducts(productList);
+      setData(productList);
+    };
+    loadProducts();
+  }, []);
+
   const handleFilter = (category) => {
     setSelected(category);
     setData([]);
     setTimeout(() => {
       if (category === 'All') {
-        setData(products);
+        setData(allProducts);
       } else {
-        const filteredData = products.filter((item) => item.category === category);
+        const filteredData = allProducts.filter((item) => item.category === category);
         setData(filteredData);
       }
     }, 50);

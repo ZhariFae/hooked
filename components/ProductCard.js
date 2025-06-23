@@ -17,13 +17,13 @@ function ProductCard({ item }) {
       <View style={styles.heartBg}>
         <FontAwesome5 name={'heart'} size={16} color={'white'} />
       </View>
-      <Image source={item.url} style={styles.img} />
+      <Image source={{ uri: item.pictureUrl }} style={styles.img} />
       <Typo size={13} style={styles.name}>
         {item.name}
       </Typo>
       <View style={styles.dotsContainer}>
         <Typo size={13} style={{ fontWeight: '600' }}>
-          {item.price}
+          ₱ {item.price}
         </Typo>
         <View style={{ flex: 1 }} />
         <View style={[styles.dot, { backgroundColor: colors.dot1 }]} />

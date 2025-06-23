@@ -19,7 +19,7 @@ function ItemDetailsScreen({ route, navigation }) {
   const allColors = [colors.dot1, colors.dot2, colors.dot3, colors.dot4, colors.gray];
   return (
     <View style={styles.container}>
-      <ItemImageSlider images={Array(5).fill(item.url)} />
+      <ItemImageSlider images={item.pictureUrl ? Array(5).fill(item.pictureUrl) : []} />
       <View style={styles.header}>
         <TouchableOpacity style={styles.iconBg} onPress={() => navigation.goBack()}>
           <MaterialIcons name="arrow-back-ios-new" size={iconSize} color="black" />
@@ -40,7 +40,7 @@ function ItemDetailsScreen({ route, navigation }) {
             {item.name}
           </Typo>
           <Typo size={20} style={styles.price}>
-            {item.price}
+            ₱ {item.price}
           </Typo>
           <Typo size={16} style={styles.seller}>
             Seller: Syed Noman

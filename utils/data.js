@@ -1,144 +1,147 @@
-const products = [
-  {
-    url: require('../assets/products/item1.png'),
-    name: 'Wireless Headphone',
-    category: 'Electronics',
-    price: '₱70.00',
-  },
-  {
-    url: require('../assets/products/item2.png'),
-    name: 'Smart Watch',
-    category: 'Watches',
-    price: '₱55.00',
-  },
-  {
-    url: require('../assets/products/item3.png'),
-    name: 'Mens Sweter',
-    category: "Men's",
-    price: '₱120.00',
-  },
-  {
-    url: require('../assets/products/item4.png'),
-    name: 'Wireless Headphone',
-    category: 'Electronics',
-    price: '₱70.00',
-  },
-  {
-    url: require('../assets/products/item5.png'),
-    name: 'Wireless Headphone',
-    category: 'Electronics',
-    price: '₱55.00',
-  },
-  {
-    url: require('../assets/products/item6.png'),
-    name: 'Air Buds',
-    category: 'Electronics',
-    price: '₱120.00',
-  },
-  {
-    url: require('../assets/products/item7.png'),
-    name: 'Air Buds',
-    category: 'Electronics',
-    price: '₱120.00',
-  },
-  {
-    url: require('../assets/products/item8.png'),
-    name: 'Smart Watch',
-    category: 'Watches',
-    price: '₱120.00',
-  },
-  {
-    url: require('../assets/products/item9.png'),
-    name: 'Mens Shirt',
-    category: "Men's",
-    price: '₱120.00',
-  },
-  {
-    url: require('../assets/products/item10.png'),
-    name: 'Wireless Headphone',
-    category: 'Electronics',
-    price: '₱120.00',
-  },
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '../auth/firebaseAuth';
 
-  {
-    url: require('../assets/products/item12.png'),
-    name: 'Smart Watch',
-    category: 'Watches',
-    price: '₱120.00',
-  },
-  {
-    url: require('../assets/products/item11.png'),
-    name: 'Nike Shoes',
-    category: 'Shoes',
-    price: '₱120.00',
-  },
-  {
-    url: require('../assets/products/item13.png'),
-    name: 'Wireless Headphone',
-    category: 'Shoes',
-    price: '₱120.00',
-  },
-  {
-    url: require('../assets/products/item14.png'),
-    name: 'Jorden Shoes',
-    category: 'Shoes',
-    price: '₱120.00',
-  },
-  {
-    url: require('../assets/products/item15.png'),
-    name: 'Nike shoe',
-    category: 'Shoes',
-    price: '₱120.00',
-  },
-  {
-    url: require('../assets/products/item16.png'),
-    name: 'T Shirt',
-    category: "Men's",
-    price: '₱120.00',
-  },
-  {
-    url: require('../assets/products/item17.png'),
-    name: 'Mens Jacket',
-    category: "Men's",
-    price: '₱120.00',
-  },
-  {
-    url: require('../assets/products/item18.png'),
-    name: 'Mens Jacket',
-    category: "Men's",
-    price: '₱120.00',
-  },
-  {
-    url: require('../assets/products/item19.png'),
-    name: 'Mens Jacket',
-    category: "Men's",
-    price: '₱120.00',
-  },
-  {
-    url: require('../assets/products/item20.png'),
-    name: 'Mens Jacket',
-    category: "Men's",
-    price: '₱120.00',
-  },
-  {
-    url: require('../assets/products/item21.png'),
-    name: 'Mens Jacket',
-    category: "Men's",
-    price: '₱120.00',
-  },
-  {
-    url: require('../assets/products/item22.png'),
-    name: 'Mens Jacket',
-    category: "Men's",
-    price: '₱120.00',
-  },
-];
+// const products = [
+//   {
+//     url: require('../assets/products/item1.png'),
+//     name: 'Wireless Headphone',
+//     category: 'Electronics',
+//     price: '₱70.00',
+//   },
+//   {
+//     url: require('../assets/products/item2.png'),
+//     name: 'Smart Watch',
+//     category: 'Watches',
+//     price: '₱55.00',
+//   },
+//   {
+//     url: require('../assets/products/item3.png'),
+//     name: 'Mens Sweter',
+//     category: "Men's",
+//     price: '₱120.00',
+//   },
+//   {
+//     url: require('../assets/products/item4.png'),
+//     name: 'Wireless Headphone',
+//     category: 'Electronics',
+//     price: '₱70.00',
+//   },
+//   {
+//     url: require('../assets/products/item5.png'),
+//     name: 'Wireless Headphone',
+//     category: 'Electronics',
+//     price: '₱55.00',
+//   },
+//   {
+//     url: require('../assets/products/item6.png'),
+//     name: 'Air Buds',
+//     category: 'Electronics',
+//     price: '₱120.00',
+//   },
+//   {
+//     url: require('../assets/products/item7.png'),
+//     name: 'Air Buds',
+//     category: 'Electronics',
+//     price: '₱120.00',
+//   },
+//   {
+//     url: require('../assets/products/item8.png'),
+//     name: 'Smart Watch',
+//     category: 'Watches',
+//     price: '₱120.00',
+//   },
+//   {
+//     url: require('../assets/products/item9.png'),
+//     name: 'Mens Shirt',
+//     category: "Men's",
+//     price: '₱120.00',
+//   },
+//   {
+//     url: require('../assets/products/item10.png'),
+//     name: 'Wireless Headphone',
+//     category: 'Electronics',
+//     price: '₱120.00',
+//   },
+
+//   {
+//     url: require('../assets/products/item12.png'),
+//     name: 'Smart Watch',
+//     category: 'Watches',
+//     price: '₱120.00',
+//   },
+//   {
+//     url: require('../assets/products/item11.png'),
+//     name: 'Nike Shoes',
+//     category: 'Shoes',
+//     price: '₱120.00',
+//   },
+//   {
+//     url: require('../assets/products/item13.png'),
+//     name: 'Wireless Headphone',
+//     category: 'Shoes',
+//     price: '₱120.00',
+//   },
+//   {
+//     url: require('../assets/products/item14.png'),
+//     name: 'Jorden Shoes',
+//     category: 'Shoes',
+//     price: '₱120.00',
+//   },
+//   {
+//     url: require('../assets/products/item15.png'),
+//     name: 'Nike shoe',
+//     category: 'Shoes',
+//     price: '₱120.00',
+//   },
+//   {
+//     url: require('../assets/products/item16.png'),
+//     name: 'T Shirt',
+//     category: "Men's",
+//     price: '₱120.00',
+//   },
+//   {
+//     url: require('../assets/products/item17.png'),
+//     name: 'Mens Jacket',
+//     category: "Men's",
+//     price: '₱120.00',
+//   },
+//   {
+//     url: require('../assets/products/item18.png'),
+//     name: 'Mens Jacket',
+//     category: "Men's",
+//     price: '₱120.00',
+//   },
+//   {
+//     url: require('../assets/products/item19.png'),
+//     name: 'Mens Jacket',
+//     category: "Men's",
+//     price: '₱120.00',
+//   },
+//   {
+//     url: require('../assets/products/item20.png'),
+//     name: 'Mens Jacket',
+//     category: "Men's",
+//     price: '₱120.00',
+//   },
+//   {
+//     url: require('../assets/products/item21.png'),
+//     name: 'Mens Jacket',
+//     category: "Men's",
+//     price: '₱120.00',
+//   },
+//   {
+//     url: require('../assets/products/item22.png'),
+//     name: 'Mens Jacket',
+//     category: "Men's",
+//     price: '₱120.00',
+//   },
+// ];
 
 const sliderImages = [
   require('../assets/slide1.png'),
   require('../assets/slide2.png'),
   require('../assets/slide3.png'),
-  // require('../assets/slide4.png'),
+  require('../assets/slide4.png'),
   require('../assets/slide5.png'),
 ];
 
@@ -172,6 +175,21 @@ const categories = [
     name: "Stuffed Toys",
   }
 ];
+
+const products = async () => {
+  try {
+    const itemsCol = collection(db, "items");              
+    const snapshot = await getDocs(itemsCol);              
+    const itemList = snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+    return itemList;                                    
+  } catch (error) {
+    console.error("Error fetching items:", error.message);
+    return [];
+  }
+}
 
 const CATEGORIES = [
   'Accessories',

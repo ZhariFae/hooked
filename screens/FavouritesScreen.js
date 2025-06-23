@@ -3,7 +3,7 @@ import FavouriteCard from 'components/FavouriteCard';
 import ScreenComponent from 'components/ScreenComponent';
 import Typo from 'components/Typo';
 import { spacingX, spacingY } from 'config/spacing';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import { StyleSheet } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 import Animated, { FadeInDown } from 'react-native-reanimated';

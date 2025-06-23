@@ -46,8 +46,11 @@ function ProfileScreen(props) {
   };
 
   const placeholderImage = "https://img.freepik.com/free-photo/handsome-smiling-man-looking-with-disbelief_176420-19591.jpg?t=st=1723641040~exp=1723644640~hmac=aef27975e23ff9df20ea1f41d340106576264a0d6c9400a220ad615579e1340b&w=740"
-  
-  const userName = Auth.user?.displayName || 'User Name';
+
+  const userRole = Auth.user?.role;
+  const userName =
+    userRole === 'Admin' ? 'Admin' : Auth.user?.displayName || 'User Name';
+
   const userEmail = Auth.user?.email || 'user@example.com';
 
   return (
