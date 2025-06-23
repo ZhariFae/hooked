@@ -32,7 +32,7 @@ function SigninScreen(props) {
 
   const handleSignIn = async () => {
     if (!email || !password){
-      Alert.alert('Error', 'Please enter email and password.')
+      Alert.alert('Error', 'Please enter your email and password.')
       return;
     }
     try {
@@ -51,21 +51,21 @@ function SigninScreen(props) {
       </View>
       <BlurView intensity={100} tint="light" style={styles.blurContainer}>
         <Typo size={26} style={styles.text}>
-          Hello Again!
+          Welcome back!
         </Typo>
         <View style={{ marginVertical: '5%' }}>
           <Typo size={20} style={styles.body}>
-            Welcome back you've
+            Your next crochet find
           </Typo>
           <Typo size={20} style={styles.body}>
-            been missed!
+            is just a stitch away.
           </Typo>
         </View>
         <View style={styles.inputView}>
           <TextInput
             value={email}
             onChangeText={setEmail}
-            placeholder="Enter email"
+            placeholder="Email"
             style={styles.input}
           />
         </View>
@@ -87,7 +87,7 @@ function SigninScreen(props) {
             </TouchableOpacity>
           )}
         </View>
-        <Typo style={styles.recoverTxt}>Recovery Possword</Typo>
+        <Typo style={styles.recoverTxt}>Recover Password</Typo>
         <AppButton
           onPress={handleSignIn}
           label={Auth.loading ? <ActivityIndicator color={colors.white} /> : 'Sign in'}
