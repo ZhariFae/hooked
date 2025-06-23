@@ -52,10 +52,6 @@ function HomeScreen({ navigation }) {
   }, [user]);
 
   useEffect(() => {
-    loadData();
-  }, [loadData]);
-
-  useEffect(() => {
     let filteredProducts = allProducts;
 
     // Apply filters from modal or the top category selector
@@ -88,10 +84,8 @@ function HomeScreen({ navigation }) {
 
   useFocusEffect(
     useCallback(() => {
-      if (user) {
-        getFavouriteIds(user.uid).then((favIds) => setFavouriteIds(new Set(favIds)));
-      }
-    }, [user])
+      loadData();
+    }, [loadData])
   );
 
   const handleToggleFavourite = async (productId) => {
@@ -177,10 +171,13 @@ function HomeScreen({ navigation }) {
             }}
             columnWrapperStyle={{ gap: spacingX._20 }}
             renderItem={({ item, index }) => {
+              const isAdmin = user?.role === 'Admin';
+              const isInactiveAndAdmin = isAdmin && item.activate === false;
               return (
                 <Animated.View
                   key={item.id}
-                  entering={FadeInDown.delay(index * 100)
+                  style={isInactiveAndAdmin ? { opacity: 0.5 } : {}}
+                  entering={FadeInDown.delay(index * 120)
                     .duration(600)
                     .damping(13)
                     .springify()}>

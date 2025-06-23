@@ -3,7 +3,9 @@ import TabNavigator from './TabNavigator';
 import { createStackNavigator } from '@react-navigation/stack';
 import ItemDetailsScreen from 'screens/ItemDetailsScreen';
 import CartScreen from 'screens/CartScreen';
+import AdminAddProductScreen from 'screens/AdminAddProductScreen';
 import NotificationsScreen from 'screens/NotificationsScreen';
+import AdminManageProductsScreen from 'screens/AdminManageProductsScreen';
 import CheckoutScreen from 'screens/CheckoutScreen';
 
 const Stack = createStackNavigator();
@@ -17,6 +19,8 @@ const AppNavigator = () => {
       <Stack.Screen name="ItemDetails" component={ItemDetailsScreen} />
       <Stack.Screen name="CartScreen" component={CartScreen} />
       <Stack.Screen name="Notifications" component={NotificationsScreen} />
+      <Stack.Screen name="AdminAddProduct" component={AdminAddProductScreen} />
+      <Stack.Screen name="AdminManageProducts" component={AdminManageProductsScreen} />
       <Stack.Screen name="Checkout" component={CheckoutScreen} />
     </Stack.Navigator>
   );

@@ -6,9 +6,10 @@ import Typo from 'components/Typo';
 import colors from 'config/colors';
 import { radius, spacingX, spacingY } from 'config/spacing';
 import { BlurView } from 'expo-blur';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useEffect } from 'react'; // Added useEffect
 import { View, StyleSheet, Image, TouchableOpacity } from 'react-native';
-import Animated, { FadeInDown, FadeInRight } from 'react-native-reanimated';
+import Animated, { FadeInDown } from 'react-native-reanimated';
+import { useNavigation } from '@react-navigation/native'; // Import useNavigation
 import { normalizeY } from 'utils/normalize';
 
 function ProfileScreen(props) {
@@ -16,6 +17,7 @@ function ProfileScreen(props) {
   const Auth = useAuth();
 
   // comment this if you don't want to animate everytime you open this screen
+  const navigation = useNavigation(); // Initialize useNavigation
   useFocusEffect(
     useCallback(() => {
       setKey((prevKey) => prevKey + 1);
@@ -56,12 +58,6 @@ function ProfileScreen(props) {
   return (
     <ScreenComponent style={styles.container}>
       <BlurView intensity={100} tint="extraLight" style={styles.blurContainer} />
-      <MaterialCommunityIcons
-        name="camera-plus"
-        size={24}
-        color={colors.black}
-        style={{ alignSelf: 'flex-end' }}
-      />
       <View style={styles.topRow}>
         <Image
           source={{
@@ -80,44 +76,32 @@ function ProfileScreen(props) {
       </View>
       <View style={{ flex: 1, gap: 15 }}>
         <View style={styles.bottomContainer}>
-          <Row
-            title={'Edit profile'}
-            iconColor={'#fbdbe6'}
-            icon={<Ionicons name="person" size={24} color={'#eb4b8b'} />}
-            index={0}
-          />
-          {/* <View style={styles.line} /> */}
-          <Row
-            title={'My stats'}
-            iconColor={'#dedffd'}
-            icon={<Ionicons name="stats-chart" size={24} color={'#5d5be5'} />}
-            index={1}
-          />
-          <Row
-            title={'Settings'}
-            iconColor={'#ffe3ce'}
-            icon={<Ionicons name="settings" size={24} color={'#f97113'} />}
-            index={2}
-          />
-          <Row
-            title={'Invite a friend'}
-            iconColor={'#F5E8E4'} // '#E9F8F9' '#176B87'
-            icon={<Ionicons name="person-add" size={24} color={'#860A35'} />}
-            index={3}
-          />
-        </View>
-        <View style={[styles.bottomContainer, { marginBottom: '30%' }]}>
-          <Row
-            title={'Help'}
-            iconColor={'#d1d1d1'}
-            icon={<Ionicons name="chatbubble-ellipses" size={24} color={colors.black} />}
-            index={4}
-          />
+          {userRole === 'Admin' && (
+            <>
+              <Row
+                title={'Add New Product'}
+                iconColor={colors.lightBlue} // Choose a suitable color
+                icon={<MaterialCommunityIcons name="plus-box" size={24} color={colors.black} />}
+                index={0} // Adjust index for animation order
+                onPress={() => navigation.navigate('AdminAddProduct')} // Placeholder navigation
+              />
+              <Row
+                title={'Manage Products'}
+                iconColor={colors.lightBlue}
+                icon={<MaterialCommunityIcons name="pencil-box-multiple" size={24} color={colors.black} />}
+                index={1}
+                onPress={() => navigation.navigate('AdminManageProducts')} // Placeholder navigation for delete/activate
+              />
+              {/* Add a separator if desired between admin and user options */}
+              {/* <View style={styles.line} /> */}
+            </>
+          )}
+
           <Row
             title={'Log out'}
             iconColor={'#d1d1d1'}
             icon={<MaterialCommunityIcons name="logout" size={24} color={colors.black} />}
-            index={5}
+            index={userRole === 'Admin' ? 2 : 0} // Adjust index based on admin rows presence
             onPress={() => Auth.logout()}
           />
         </View>
