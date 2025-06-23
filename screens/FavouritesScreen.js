@@ -1,21 +1,36 @@
 import { useFocusEffect } from '@react-navigation/native';
+import useAuth from 'auth/useAuth';
 import FavouriteCard from 'components/FavouriteCard';
 import ScreenComponent from 'components/ScreenComponent';
 import Typo from 'components/Typo';
 import { spacingX, spacingY } from 'config/spacing';
-import React, { useCallback, useState, useEffect } from 'react';
+import React, { useCallback, useState } from 'react';
 import { StyleSheet } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 import Animated, { FadeInDown } from 'react-native-reanimated';
-import { products } from 'utils/data';
+import { getFavouriteProducts, toggleFavourite } from 'services/userDataService';
 
 function FavouritesScreen(props) {
   const [key, setKey] = useState(0);
+  const [products, setProducts] = useState([]);
+  const { user } = useAuth();
+
+  const loadFavouriteProducts = useCallback(async () => {
+    if (user) {
+      const favProducts = await getFavouriteProducts(user.uid);
+      setProducts(favProducts);
+    }
+  }, [user]);
+
+  const handleRemoveFavourite = async (productId) => {
+    await toggleFavourite(user.uid, productId, true);
+    loadFavouriteProducts(); // Refresh the list
+  };
 
   useFocusEffect(
     useCallback(() => {
-      setKey((prevKey) => prevKey + 1);
-    }, [])
+      loadFavouriteProducts();
+    }, [loadFavouriteProducts])
   );
   return (
     <ScreenComponent>
@@ -35,7 +50,7 @@ function FavouritesScreen(props) {
                 .duration(2000)
                 .damping(12)
                 .springify()}>
-              <FavouriteCard item={item} />
+              <FavouriteCard item={item} onRemove={() => handleRemoveFavourite(item.id)} />
             </Animated.View>
           );
         }}

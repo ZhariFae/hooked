@@ -1,4 +1,4 @@
-import { FontAwesome5 } from '@expo/vector-icons';
+import { AntDesign } from '@expo/vector-icons';
 import colors from 'config/colors';
 import { radius, spacingX, spacingY } from 'config/spacing';
 import React from 'react';
@@ -8,15 +8,15 @@ import { normalizeY } from 'utils/normalize';
 import { useNavigation } from '@react-navigation/native';
 const { width, height } = Dimensions.get('screen');
 
-function ProductCard({ item }) {
+function ProductCard({ item, isFavourite, onToggleFavourite }) {
   const navigation = useNavigation();
   return (
     <TouchableOpacity
       style={styles.container}
       onPress={() => navigation.navigate('ItemDetails', item)}>
-      <View style={styles.heartBg}>
-        <FontAwesome5 name={'heart'} size={16} color={'white'} />
-      </View>
+      <TouchableOpacity style={styles.heartBg} onPress={onToggleFavourite}>
+        <AntDesign name={isFavourite ? 'heart' : 'hearto'} size={16} color={colors.white} />
+      </TouchableOpacity>
       <Image source={{ uri: item.pictureUrl }} style={styles.img} />
       <Typo size={13} style={styles.name}>
         {item.name}
@@ -25,11 +25,6 @@ function ProductCard({ item }) {
         <Typo size={13} style={{ fontWeight: '600' }}>
           ₱ {item.price}
         </Typo>
-        <View style={{ flex: 1 }} />
-        <View style={[styles.dot, { backgroundColor: colors.dot1 }]} />
-        <View style={[styles.dot, { backgroundColor: colors.dot2 }]} />
-        <View style={[styles.dot, { backgroundColor: colors.dot3 }]} />
-        <View style={[styles.dot, { backgroundColor: colors.dot4 }]} />
       </View>
     </TouchableOpacity>
   );

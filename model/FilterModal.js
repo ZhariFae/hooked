@@ -14,16 +14,12 @@ import {
   FlatList,
 } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
-import { BRANDS, CATEGORIES, COLORS, STYLES, SIZES } from 'utils/data';
+import { CATEGORIES } from 'utils/data';
 import { normalizeY } from 'utils/normalize';
 const { height } = Dimensions.get('screen');
 
 function FilterModal({ visible, setVisible }) {
   const [selectedCategories, setSelectedCategories] = useState([]);
-  const [selectedStyles, setSelectedStyles] = useState([]);
-  const [selectedBrands, setSelectedBrands] = useState([]);
-  const [selectedColors, setSelectedColors] = useState([]);
-  const [selectedSizes, setSelectedSizes] = useState([]);
   const [low, setLow] = useState(0);
   const [high, setHigh] = useState(1000);
 
@@ -33,38 +29,6 @@ function FilterModal({ visible, setVisible }) {
       setSelectedCategories(filtered);
     } else {
       setSelectedCategories([...selectedCategories, name]);
-    }
-  };
-  const handleSelectStyles = (name) => {
-    if (selectedStyles.includes(name)) {
-      const filtered = selectedStyles.filter((item) => item !== name);
-      setSelectedStyles(filtered);
-    } else {
-      setSelectedStyles([...selectedStyles, name]);
-    }
-  };
-  const handleSelectBrands = (name) => {
-    if (selectedBrands.includes(name)) {
-      const filtered = selectedBrands.filter((item) => item !== name);
-      setSelectedBrands(filtered);
-    } else {
-      setSelectedBrands([...selectedBrands, name]);
-    }
-  };
-  const handleSelectSizes = (name) => {
-    if (selectedSizes.includes(name)) {
-      const filtered = selectedSizes.filter((item) => item !== name);
-      setSelectedSizes(filtered);
-    } else {
-      setSelectedSizes([...selectedSizes, name]);
-    }
-  };
-  const handleSelectColors = (name) => {
-    if (selectedColors.includes(name)) {
-      const filtered = selectedColors.filter((item) => item !== name);
-      setSelectedColors(filtered);
-    } else {
-      setSelectedColors([...selectedColors, name]);
     }
   };
 
@@ -122,140 +86,7 @@ function FilterModal({ visible, setVisible }) {
                 }}
               />
             </Animated.ScrollView>
-            <Heading title={'Style'} index={2} />
-            <Animated.ScrollView
-              horizontal
-              entering={FadeInDown.delay(2 * 130)
-                .duration(300)
-                .springify()
-                .damping(12)
-                .stiffness(80)}>
-              <FlatList
-                scrollEnabled={false}
-                data={STYLES}
-                numColumns={3}
-                contentContainerStyle={{ gap: spacingY._10 }}
-                columnWrapperStyle={{ gap: spacingX._10 }}
-                keyExtractor={(item, index) => index.toString()}
-                renderItem={({ item, index }) => {
-                  return (
-                    <TouchableOpacity
-                      style={styles.listItem}
-                      onPress={() => handleSelectStyles(item)}>
-                      {selectedStyles.includes(item) ? (
-                        <AntDesign name="checkcircle" size={18} color={colors.primary} />
-                      ) : (
-                        <View style={styles.circle} />
-                      )}
-                      <Typo>{item}</Typo>
-                    </TouchableOpacity>
-                  );
-                }}
-              />
-            </Animated.ScrollView>
-            <Heading title={'Brand'} index={3} />
-            <Animated.ScrollView
-              horizontal
-              entering={FadeInDown.delay(3 * 130)
-                .duration(300)
-                .springify()
-                .damping(12)
-                .stiffness(80)}>
-              <FlatList
-                scrollEnabled={false}
-                data={BRANDS}
-                numColumns={3}
-                contentContainerStyle={{ gap: spacingY._10 }}
-                columnWrapperStyle={{ gap: spacingX._10 }}
-                keyExtractor={(item, index) => index.toString()}
-                renderItem={({ item, index }) => {
-                  return (
-                    <TouchableOpacity
-                      style={styles.listItem}
-                      onPress={() => handleSelectBrands(item)}>
-                      {selectedBrands.includes(item) ? (
-                        <AntDesign name="checkcircle" size={18} color={colors.primary} />
-                      ) : (
-                        <View style={styles.circle} />
-                      )}
-                      <Typo>{item}</Typo>
-                    </TouchableOpacity>
-                  );
-                }}
-              />
-            </Animated.ScrollView>
-            <Heading title={'Color'} index={4} />
-            <Animated.ScrollView
-              horizontal
-              entering={FadeInDown.delay(4 * 130)
-                .duration(300)
-                .springify()
-                .damping(12)
-                .stiffness(80)}>
-              <FlatList
-                scrollEnabled={false}
-                data={COLORS}
-                numColumns={4}
-                contentContainerStyle={{ gap: spacingY._10 }}
-                columnWrapperStyle={{ gap: spacingX._10 }}
-                keyExtractor={(item, index) => index.toString()}
-                renderItem={({ item, index }) => {
-                  const isInclude = selectedColors.includes(item);
-                  return (
-                    <TouchableOpacity
-                      style={[
-                        styles.listItem,
-                        {
-                          borderColor: isInclude ? colors.blue : colors.lightGray,
-                          borderWidth: isInclude ? 2 : 1,
-                          margin: isInclude ? 0 : 1,
-                        },
-                      ]}
-                      onPress={() => handleSelectColors(item)}>
-                      <View
-                        style={[
-                          styles.circle,
-                          { backgroundColor: item.toLowerCase(), borderWidth: 0 },
-                        ]}
-                      />
-                      <Typo>{item}</Typo>
-                    </TouchableOpacity>
-                  );
-                }}
-              />
-            </Animated.ScrollView>
-            <Heading title={'Size'} index={5} />
-            <Animated.ScrollView
-              horizontal
-              entering={FadeInDown.delay(5 * 130)
-                .duration(300)
-                .springify()
-                .damping(12)
-                .stiffness(80)}>
-              <FlatList
-                scrollEnabled={false}
-                data={SIZES}
-                numColumns={4}
-                contentContainerStyle={{ gap: spacingY._10 }}
-                columnWrapperStyle={{ gap: spacingX._10 }}
-                keyExtractor={(item, index) => index.toString()}
-                renderItem={({ item, index }) => {
-                  return (
-                    <TouchableOpacity
-                      style={styles.listItem}
-                      onPress={() => handleSelectSizes(item)}>
-                      {selectedSizes.includes(item) ? (
-                        <AntDesign name="checkcircle" size={18} color={colors.primary} />
-                      ) : (
-                        <View style={styles.circle} />
-                      )}
-                      <Typo>{item}</Typo>
-                    </TouchableOpacity>
-                  );
-                }}
-              />
-            </Animated.ScrollView>
-            <Heading title={'Price Range'} index={6} />
+            <Heading title={'Price Range'} index={2} />
             <View>
               <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                 <Typo>${low}</Typo>

@@ -1,22 +1,41 @@
 import { AntDesign, MaterialIcons } from '@expo/vector-icons';
-import { border } from '@shopify/restyle';
+import useAuth from 'auth/useAuth';
 import AppButton from 'components/AppButton';
 import DetailsSelector from 'components/DetailsSelector';
 import ItemImageSlider from 'components/ItemImageSlider';
 import Typo from 'components/Typo';
 import colors from 'config/colors';
 import { radius, spacingX, spacingY } from 'config/spacing';
-import React, { useState } from 'react';
-import { View, StyleSheet, Platform, Dimensions, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useCallback, useEffect, useState } from 'react';
+import {
+  View,
+  StyleSheet,
+  Platform,
+  Dimensions,
+  ScrollView,
+  TouchableOpacity,
+  Alert,
+} from 'react-native';
+import { isFavourite, toggleFavourite, addToCart } from 'services/userDataService';
 import { normalizeX, normalizeY } from 'utils/normalize';
 const { height } = Dimensions.get('screen');
 
 function ItemDetailsScreen({ route, navigation }) {
   const iconSize = 18;
   const item = route.params;
-  const [selectedColor, setSelectedColor] = useState(colors.dot1);
+  const { user } = useAuth();
+  const [isFav, setIsFav] = useState(false);
+  const [quantity, setQuantity] = useState(1);
+
+  useEffect(() => {
+    const checkIfFavourite = async () => {
+      const favStatus = await isFavourite(user?.uid, item.id);
+      setIsFav(favStatus);
+    };
+    checkIfFavourite();
+  }, [user, item.id]);
+
   const [selected, setSelected] = useState('Description');
-  const allColors = [colors.dot1, colors.dot2, colors.dot3, colors.dot4, colors.gray];
   return (
     <View style={styles.container}>
       <ItemImageSlider images={item.pictureUrl ? Array(5).fill(item.pictureUrl) : []} />
@@ -28,9 +47,22 @@ function ItemDetailsScreen({ route, navigation }) {
         <View style={styles.iconBg}>
           <AntDesign name="sharealt" size={iconSize} color="black" />
         </View>
-        <View style={styles.iconBg}>
-          <AntDesign name="hearto" size={iconSize} color="black" />
-        </View>
+        <TouchableOpacity
+          style={styles.iconBg}
+          onPress={async () => {
+            if (!user) {
+              return navigation.navigate('Login');
+            }
+            try {
+              await toggleFavourite(user.uid, item.id, isFav);
+              setIsFav(!isFav);
+            } catch (error) {
+              console.error('Failed to toggle favourite:', error);
+              Alert.alert('Error', 'Could not update favourite status.');
+            }
+          }}>
+          <AntDesign name={isFav ? 'heart' : 'hearto'} size={iconSize} color={colors.primary} />
+        </TouchableOpacity>
       </View>
       <View style={styles.bottomContainer}>
         <ScrollView
@@ -53,22 +85,6 @@ function ItemDetailsScreen({ route, navigation }) {
               </Typo>
             </View>
             <Typo style={{ color: colors.gray }}> (320 Review)</Typo>
-          </View>
-          <Typo size={18} style={styles.colorTxt}>
-            Color
-          </Typo>
-          <View style={{ flexDirection: 'row', gap: spacingX._5 }}>
-            {allColors.map((color, index) => (
-              <TouchableOpacity
-                key={index}
-                style={[
-                  styles.border,
-                  { borderColor: selectedColor === color ? colors.black : colors.white },
-                ]}
-                onPress={() => setSelectedColor(color)}>
-                <View style={[styles.dot, { backgroundColor: color }]} />
-              </TouchableOpacity>
-            ))}
           </View>
           <DetailsSelector selected={selected} setSelected={setSelected} />
           {selected == 'Description' ? (
@@ -95,19 +111,25 @@ function ItemDetailsScreen({ route, navigation }) {
         </ScrollView>
         <View style={styles.buttonContainer}>
           <View style={styles.countView}>
-            <Typo size={20} style={styles.count}>
+            <Typo onPress={() => setQuantity(Math.max(1, quantity - 1))} size={20} style={styles.count}>
               -
             </Typo>
             <Typo size={20} style={styles.count}>
-              1
+              {quantity}
             </Typo>
-            <Typo size={20} style={styles.count}>
+            <Typo onPress={() => setQuantity(quantity + 1)} size={20} style={styles.count}>
               +
             </Typo>
           </View>
           <AppButton
             style={{ width: '60%', marginTop: 0 }}
-            onPress={() => navigation.navigate('Cart')}
+            onPress={async () => {
+              if (user) {
+                await addToCart(user.uid, item.id, quantity);
+                Alert.alert('Success', `${quantity} x ${item.name} added to cart!`);
+                navigation.navigate('Cart');
+              }
+            }}
             label={'Add to Cart'}
           />
         </View>

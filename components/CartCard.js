@@ -1,19 +1,19 @@
 import React from 'react';
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import colors from 'config/colors';
-import { View, Image, Dimensions, StyleSheet } from 'react-native';
+import { View, Image, Dimensions, StyleSheet, TouchableOpacity } from 'react-native';
 import Typo from './Typo';
 import { normalizeX, normalizeY } from 'utils/normalize';
 import { spacingY } from 'config/spacing';
 const { width } = Dimensions.get('screen');
 
-function CartCard({ item }) {
+function CartCard({ item, onQuantityChange }) {
   const imgSize = width * 0.2;
   return (
     <View style={styles.container}>
       <View style={styles.imgContainer}>
         <Image
-          source={item.url}
+          source={{ uri: item.pictureUrl }}
           resizeMode="contain"
           style={{
             width: imgSize,
@@ -26,15 +26,21 @@ function CartCard({ item }) {
           <Typo size={17} style={{ fontWeight: 'bold' }}>
             {item.name}
           </Typo>
-          <MaterialIcons name="delete-outline" size={normalizeY(24)} color={colors.primary} />
+          <TouchableOpacity onPress={() => onQuantityChange(0)}>
+            <MaterialIcons name="delete-outline" size={normalizeY(24)} color={colors.primary} />
+          </TouchableOpacity>
         </View>
         <Typo style={styles.catText}>{item.category}</Typo>
         <View style={styles.row}>
-          <Typo style={{ fontWeight: 'bold' }}>{item.price}</Typo>
+          <Typo style={{ fontWeight: 'bold' }}>₱{item.price}</Typo>
           <View style={styles.countContanier}>
-            <Typo style={{ fontWeight: 'bold' }}>-</Typo>
-            <Typo style={{ fontWeight: 'bold' }}>1</Typo>
-            <Typo style={{ fontWeight: 'bold' }}>+</Typo>
+            <TouchableOpacity onPress={() => onQuantityChange(item.quantity - 1)}>
+              <Typo style={{ fontWeight: 'bold' }}>-</Typo>
+            </TouchableOpacity>
+            <Typo style={{ fontWeight: 'bold' }}>{item.quantity}</Typo>
+            <TouchableOpacity onPress={() => onQuantityChange(item.quantity + 1)}>
+              <Typo style={{ fontWeight: 'bold' }}>+</Typo>
+            </TouchableOpacity>
           </View>
         </View>
       </View>

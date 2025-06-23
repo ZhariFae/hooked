@@ -1,5 +1,6 @@
-import { Entypo, Ionicons } from '@expo/vector-icons';
+import { AntDesign, Entypo, Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
+import useAuth from 'auth/useAuth';
 import CategoryItem from 'components/CategoryItem';
 import ImageSlideShow from 'components/ImageSlideShow';
 import ProductCard from 'components/ProductCard';
@@ -12,30 +13,55 @@ import FilterModal from 'model/FilterModal';
 import React, { useCallback, useState, useEffect } from 'react';
 import { View, StyleSheet, FlatList, ScrollView, Image, TouchableOpacity } from 'react-native';
 import Animated, { FadeInDown, FadeInRight } from 'react-native-reanimated';
-import { products as fetchProducts, categories } from 'utils/data';
+import { getFavouriteIds, toggleFavourite } from 'services/userDataService';
+import { categories, products as fetchProducts } from 'utils/data';
 import { normalizeX, normalizeY } from 'utils/normalize';
 
 function HomeScreen({ navigation }) {
+  const { user } = useAuth();
   const [filterModalVisible, setFilterModalVisible] = useState(false);
   const [selected, setSelected] = useState('All');
-    const [allProducts, setAllProducts] = useState([]);
+  const [allProducts, setAllProducts] = useState([]);
   const [data, setData] = useState([]);
-  const [key, setKey] = useState(0);
+  const [favouriteIds, setFavouriteIds] = useState(new Set());
 
-  // useFocusEffect(
-  //   useCallback(() => {
-  //     setKey((prevKey) => prevKey + 1);
-  //   }, [])
-  // );
+  const loadData = useCallback(async () => {
+    // Fetch products
+    const productList = await fetchProducts();
+    const visibleProducts =
+      user?.role === 'Admin' ? productList : productList.filter((p) => p.activate);
+    setAllProducts(visibleProducts);
+    if (selected === 'All') {
+      setData(visibleProducts);
+    }
+
+    // Fetch favourites
+    if (user) {
+      const favIds = await getFavouriteIds(user.uid);
+      setFavouriteIds(new Set(favIds));
+    }
+  }, [user, selected]);
 
   useEffect(() => {
-    const loadProducts = async () => {
-      const productList = await fetchProducts();
-      setAllProducts(productList);
-      setData(productList);
-    };
-    loadProducts();
-  }, []);
+    loadData();
+  }, [loadData]);
+
+  useFocusEffect(
+    useCallback(() => {
+      if (user) {
+        getFavouriteIds(user.uid).then((favIds) => setFavouriteIds(new Set(favIds)));
+      }
+    }, [user])
+  );
+
+  const handleToggleFavourite = async (productId) => {
+    if (!user) return navigation.navigate('Login');
+    const isCurrentlyFavourite = favouriteIds.has(productId);
+    await toggleFavourite(user.uid, productId, isCurrentlyFavourite);
+    const newFavouriteIds = new Set(favouriteIds);
+    isCurrentlyFavourite ? newFavouriteIds.delete(productId) : newFavouriteIds.add(productId);
+    setFavouriteIds(newFavouriteIds);
+  };
 
   const handleFilter = (category) => {
     setSelected(category);
@@ -83,7 +109,6 @@ function HomeScreen({ navigation }) {
                 isSelected={isSelected}
                 index={index}
                 key={index}
-                keyValue={key}
               />
             );
           }}
@@ -100,7 +125,7 @@ function HomeScreen({ navigation }) {
             scrollEnabled={false}
             numColumns={2}
             data={data}
-            keyExtractor={(item, index) => index.toString()}
+            keyExtractor={(item) => item.id.toString()}
             contentContainerStyle={{
               gap: spacingX._20,
               paddingHorizontal: spacingX._20,
@@ -110,12 +135,16 @@ function HomeScreen({ navigation }) {
             renderItem={({ item, index }) => {
               return (
                 <Animated.View
-                  key={`${key}-${index}`}
+                  key={item.id}
                   entering={FadeInDown.delay(index * 100)
                     .duration(600)
                     .damping(13)
                     .springify()}>
-                  <ProductCard item={item} />
+                  <ProductCard
+                    item={item}
+                    isFavourite={favouriteIds.has(item.id)}
+                    onToggleFavourite={() => handleToggleFavourite(item.id)}
+                  />
                 </Animated.View>
               );
             }}

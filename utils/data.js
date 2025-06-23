@@ -201,35 +201,6 @@ const CATEGORIES = [
 
 ];
 
-const STYLES = ['Regular', 'Oversized', 'Slim', 'Relaxed', 'Skinny', 'Muscie'];
-const BRANDS = [
-  'Nike',
-  'Adidas',
-  'Yeezy',
-  'New Balance',
-  'Supreme',
-  'Gap',
-  'Balenciaga',
-  'Off White',
-  'Vans',
-  'Carhartt',
-  'Asics',
-  'Burberry',
-];
-
-const COLORS = [
-  'Blue',
-  'Red',
-  'Green',
-  'Yellow',
-  'Brown',
-  'Pink',
-  'Purple',
-  'Black',
-  'White',
-  'Gray',
-];
-const SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '36', '38', '40', '42', '44', '46'];
 const notifications = [
   {
     id: 1,
@@ -378,9 +349,5 @@ export {
   sliderImages,
   categories,
   CATEGORIES,
-  STYLES,
-  BRANDS,
-  COLORS,
-  SIZES,
   notifications,
 };

@@ -9,9 +9,13 @@ import React, { useState } from 'react';
 import { View, StyleSheet, TouchableOpacity, ScrollView, Image } from 'react-native';
 import { normalizeX, normalizeY } from 'utils/normalize';
 
-function CheckoutScreen({}) {
+function CheckoutScreen({ route }) {
+  const { cartTotal } = route.params;
   const [selectedMethod, setSelectedMethod] = useState('Credit Card');
   const [selectedAddress, setSelectedAddress] = useState('Home');
+  const shippingFee = 30.0;
+  const subtotal = cartTotal;
+  const finalTotal = subtotal + shippingFee;
   return (
     <ScreenComponent style={styles.container}>
       <Header label={'Checkout'} />
@@ -67,11 +71,11 @@ function CheckoutScreen({}) {
       </ScrollView>
 
       <View style={styles.checkoutContainer}>
-        <Row title={'Shipping fee'} price={'$30'} />
+        <Row title={'Shipping fee'} price={`₱${shippingFee.toFixed(2)}`} />
         <View style={styles.separator} />
-        <Row title={'Subtotal'} price={'$245.00'} />
+        <Row title={'Subtotal'} price={`₱${subtotal.toFixed(2)}`} />
         <View style={styles.separator} />
-        <Row title={'Total'} price={'$245.00'} />
+        <Row title={'Total'} price={`₱${finalTotal.toFixed(2)}`} />
         <AppButton label={'Payment'} />
       </View>
     </ScreenComponent>

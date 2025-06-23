@@ -6,10 +6,9 @@ import { normalizeX, normalizeY } from 'utils/normalize';
 import { radius, spacingY } from 'config/spacing';
 import colors from 'config/colors';
 
-const CategoryItem = ({ item, isSelected, onPress, index, keyValue }) => {
+const CategoryItem = ({ item, isSelected, onPress, index }) => {
   return (
     <Animated.View
-      key={`${keyValue}-${index}`}
       style={styles.catCircle}
       entering={FadeInRight.delay(index * 100)
         .duration(1000)

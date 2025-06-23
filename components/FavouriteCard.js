@@ -8,7 +8,7 @@ import { spacingY } from 'config/spacing';
 import { useNavigation } from '@react-navigation/native';
 const { width } = Dimensions.get('screen');
 
-function FavouriteCard({ item }) {
+function FavouriteCard({ item, onRemove }) {
   const navigation = useNavigation();
   const imgSize = width * 0.2;
   return (
@@ -30,7 +30,9 @@ function FavouriteCard({ item }) {
           <Typo size={17} style={{ fontWeight: 'bold' }}>
             {item.name}
           </Typo>
-          <MaterialIcons name="delete-outline" size={normalizeY(24)} color={colors.primary} />
+          <TouchableOpacity onPress={onRemove}>
+            <MaterialIcons name="delete-outline" size={normalizeY(24)} color={colors.primary} />
+          </TouchableOpacity>
         </View>
         <Typo style={styles.catText}>{item.category}</Typo>
         <Typo style={{ fontWeight: 'bold' }}>₱ {item.price}</Typo>

@@ -5,7 +5,7 @@ import ScreenComponent from 'components/ScreenComponent';
 import Typo from 'components/Typo';
 import colors from 'config/colors';
 import { height, radius, spacingX, spacingY } from 'config/spacing';
-import React from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   FlatList,
   Text,
@@ -15,18 +15,52 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
-import { products } from 'utils/data';
+import { getCartProducts, updateCartItemQuantity } from 'services/userDataService';
 import { normalizeX, normalizeY } from 'utils/normalize';
+import useAuth from 'auth/useAuth';
 
 function CartScreen({ navigation }) {
+  const [products, setProducts] = useState([]);
+  const [total, setTotal] = useState(0);
+  const { user } = useAuth();
+
+  const loadCart = useCallback(async () => {
+    if (user) {
+      const cartProducts = await getCartProducts(user.uid);
+      setProducts(cartProducts);
+    }
+  }, [user]);
+
+  const handleQuantityChange = async (productId, newQuantity) => {
+    await updateCartItemQuantity(user.uid, productId, newQuantity);
+    loadCart(); // Refresh cart
+  };
+
+  useEffect(() => {
+    const calculateTotal = () => {
+      const newTotal = products.reduce((sum, item) => {
+        return sum + item.price * item.quantity;
+      }, 0);
+      setTotal(newTotal);
+    };
+    calculateTotal();
+  }, [products]);
+
+  useFocusEffect(
+    useCallback(() => {
+      loadCart();
+    }, [loadCart])
+  );
+
   return (
     <ScreenComponent style={styles.container}>
       <Header label={'My Cart'} />
       <FlatList
         data={products}
         style={{ flex: 1 }}
-        keyExtractor={(item, index) => index.toString()}
+        keyExtractor={(item) => item.id.toString()}
         contentContainerStyle={styles.listContainer}
         renderItem={({ item, index }) => {
           return (
@@ -35,7 +69,10 @@ function CartScreen({ navigation }) {
                 .duration(2000)
                 .damping(12)
                 .springify()}>
-              <CartCard item={item} />
+              <CartCard
+                item={item}
+                onQuantityChange={(newQuantity) => handleQuantityChange(item.id, newQuantity)}
+              />
             </Animated.View>
           );
         }}
@@ -52,10 +89,10 @@ function CartScreen({ navigation }) {
             <TextInput style={styles.input} placeholder="Enter Discount Code" />
             <Text style={styles.applyText}>Apply</Text>
           </View>
-          <Row title={'Subtotal'} price={'₱245.00'} />
+          <Row title={'Subtotal'} price={`₱${total.toFixed(2)}`} />
           <View style={styles.separator} />
-          <Row title={'Total'} price={'₱245.00'} />
-          <AppButton label={'Checkout'} onPress={() => navigation.navigate('Checkout')} />
+          <Row title={'Total'} price={`₱${total.toFixed(2)}`} />
+          <AppButton label={'Checkout'} onPress={() => navigation.navigate('Checkout', { cartTotal: total })} />
         </View>
       </KeyboardAvoidingView>
       {/* <View style={{ height: '12%', backgroundColor: colors.white }} /> */}
