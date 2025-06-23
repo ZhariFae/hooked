@@ -26,7 +26,7 @@ function StartScreen(props) {
       </View>
       <BlurView intensity={100} tint="light" style={styles.blurContainer}>
         <Animated.View entering={FadeIn.duration(700)} style={styles.imgContainer}>
-          <Image source={require('../assets/startImage.png')} style={styles.img} />
+          <Image source={require('../assets/Hooked.png')} style={styles.img} />
         </Animated.View>
         <View>
           <Animated.View entering={FadeInDown.delay(100).duration(500).springify().damping(12)}>

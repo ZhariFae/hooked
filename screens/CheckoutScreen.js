@@ -30,15 +30,15 @@ function CheckoutScreen({ route }) {
           selected={selectedAddress}
           setSelected={setSelectedAddress}
           title="Home"
-          phone="(319) 555-0115"
-          address="482 W Dallas St Wallace"
+          phone="(+63) 123 456 7890"
+          address="123 Salcedo Street, Makati City"
         />
         <AddressCard
           selected={selectedAddress}
           setSelected={setSelectedAddress}
           title="Office"
-          phone="(207) 555-0119"
-          address="1749 Wheeler Ridge"
+          phone="(+63) 123 456 7890"
+          address="123 Ayala Avenue, Makati City"
         />
 
         <Typo size={18} style={{ fontWeight: '600' }}>
