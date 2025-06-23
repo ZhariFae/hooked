@@ -93,10 +93,7 @@ function CartScreen({ navigation }) {
           borderTopLeftRadius: radius._20,
         }}>
         <View style={styles.checkoutContainer}>
-          <View style={styles.discountRow}>
-            <TextInput style={styles.input} placeholder="Enter Discount Code" />
-            <Text style={styles.applyText}>Apply</Text>
-          </View>
+          {/* Discount row removed */}
           <Row title={'Subtotal'} price={`₱${total.toFixed(2)}`} />
           <View style={styles.separator} />
           <Row title={'Total'} price={`₱${total.toFixed(2)}`} />
@@ -152,6 +149,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   discountRow: {
+    // This style is no longer used but kept for completeness based on original code structure.
     height: height.input,
     backgroundColor: colors.grayBG,
     width: '100%',
@@ -162,11 +160,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   input: {
+    // This style is no longer used.
     fontSize: normalizeY(16),
     flex: 1,
     paddingRight: spacingX._10,
   },
   applyText: {
+    // This style is no longer used.
     fontSize: normalizeY(18),
     color: colors.primary,
     fontWeight: '600',
