@@ -1,243 +1,246 @@
-import { AntDesign, Entypo } from '@expo/vector-icons';
-import { Slider } from '@miblanchard/react-native-slider';
+import { AntDesign, Entypo, Ionicons } from '@expo/vector-icons';
+import { useFocusEffect } from '@react-navigation/native';
+import useAuth from 'auth/useAuth';
+import CategoryItem from 'components/CategoryItem';
+import ImageSlideShow from 'components/ImageSlideShow';
+import ProductCard from 'components/ProductCard';
+import ScreenComponent from 'components/ScreenComponent';
+import SearchBar from 'components/SearchBar';
 import Typo from 'components/Typo';
 import colors from 'config/colors';
 import { radius, spacingX, spacingY } from 'config/spacing';
-import React, { useState } from 'react';
-import { useEffect } from 'react'; // Added useEffect
-import {
-  View,
-  StyleSheet,
-  Modal,
-  TouchableOpacity,
-  Dimensions,
-  ScrollView,
-  FlatList,
-} from 'react-native';
-import Animated, { FadeInDown } from 'react-native-reanimated';
-import { CATEGORIES } from 'utils/data';
-import { normalizeY } from 'utils/normalize';
-const { height } = Dimensions.get('screen');
+import FilterModal from 'model/FilterModal';
+import React, { useCallback, useState, useEffect } from 'react';
+import { View, StyleSheet, FlatList, ScrollView, Image, TouchableOpacity } from 'react-native';
+import Animated, { FadeInDown, FadeInRight } from 'react-native-reanimated';
+import { getFavouriteIds, toggleFavourite } from 'services/userDataService';
+import { categories, products as fetchProducts } from 'utils/data';
+import { normalizeX, normalizeY } from 'utils/normalize';
 
-function FilterModal({ visible, setVisible, maxPrice, onApplyFilters }) {
-  const [selectedCategories, setSelectedCategories] = useState([]);
-  const defaultMaxPrice = 1000; // Define a default max price
-  const initialHigh = maxPrice > 0 ? maxPrice : defaultMaxPrice;
+function HomeScreen({ navigation }) {
+  const { user } = useAuth();
+  const [filterModalVisible, setFilterModalVisible] = useState(false);
+  const [selected, setSelected] = useState('All');
+  const [allProducts, setAllProducts] = useState([]);
+  const [data, setData] = useState([]);
+  const [maxProductPrice, setMaxProductPrice] = useState(1000); // Default max price
+  const [favouriteIds, setFavouriteIds] = useState(new Set());
+  const [filters, setFilters] = useState({
+    categories: [],
+    priceRange: null,
+  });
+  const [searchQuery, setSearchQuery] = useState('');
 
-  const [low, setLow] = useState(0); // Initialize low to 0
-  const [high, setHigh] = useState(initialHigh); // Initialize high with maxPrice or default
+  const loadData = useCallback(async () => {
+    // Fetch products
+    const productList = await fetchProducts();
+    const visibleProducts =
+      user?.role === 'Admin' ? productList : productList.filter((p) => p.activate);
+    setAllProducts(visibleProducts);
 
-  // Reset filters to default when modal becomes visible
+    // Calculate max price from visible products
+    if (visibleProducts.length > 0) {
+      const maxPrice = Math.max(...visibleProducts.map((p) => p.price));
+      setMaxProductPrice(maxPrice);
+    }
+
+    // Fetch favourites
+    if (user) {
+      const favIds = await getFavouriteIds(user.uid);
+      setFavouriteIds(new Set(favIds));
+    }
+  }, [user]);
+
   useEffect(() => {
-    if (visible) {
-      setSelectedCategories([]);
-      setLow(0);
-      setHigh(maxPrice > 0 ? maxPrice : defaultMaxPrice);
+    let filteredProducts = allProducts;
+
+    // Apply filters from modal or the top category selector
+    // 1. Category filter
+    if (filters.categories && filters.categories.length > 0) {
+      // Use categories from the filter modal if they exist
+      filteredProducts = filteredProducts.filter((item) =>
+        filters.categories.includes(item.category)
+      );
+    } else if (selected !== 'All') {
+      // Otherwise, use the top category selector
+      filteredProducts = filteredProducts.filter((item) => item.category === selected);
     }
-  }, [visible]);
 
-  const handleSelectCategories = (name) => {
-    if (selectedCategories.includes(name)) {
-      const filtered = selectedCategories.filter((item) => item !== name);
-      setSelectedCategories(filtered);
-    } else {
-      setSelectedCategories([...selectedCategories, name]);
+    // 2. Price range filter
+    if (filters.priceRange) {
+      filteredProducts = filteredProducts.filter(
+        (item) => item.price >= filters.priceRange.low && item.price <= filters.priceRange.high
+      );
     }
+
+    // 3. Search query filter
+    if (searchQuery) {
+      filteredProducts = filteredProducts.filter((item) =>
+        item.name.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+    setData(filteredProducts);
+  }, [searchQuery, selected, allProducts, filters]);
+
+  useFocusEffect(
+    useCallback(() => {
+      loadData();
+    }, [loadData])
+  );
+
+  const handleToggleFavourite = async (productId) => {
+    if (!user) return navigation.navigate('Login');
+    const isCurrentlyFavourite = favouriteIds.has(productId);
+    await toggleFavourite(user.uid, productId, isCurrentlyFavourite);
+    const newFavouriteIds = new Set(favouriteIds);
+    isCurrentlyFavourite ? newFavouriteIds.delete(productId) : newFavouriteIds.add(productId);
+    setFavouriteIds(newFavouriteIds);
   };
 
-  const handleApply = () => {
-    onApplyFilters({
-      categories: selectedCategories,
-      priceRange: { low, high },
-    });
-    setVisible(false);
+  const handleFilter = (category) => {
+    setSelected(category);
+    // Clear modal filters when a quick filter is selected for a clean state
+    setFilters({ categories: [], priceRange: null });
   };
 
-  const handleReset = () => {
-    // Reset local state
-    setSelectedCategories([]);
-    setLow(0);
-    setHigh(maxPrice > 0 ? maxPrice : defaultMaxPrice);
-    // Apply reset to home screen and close modal
-    onApplyFilters({ categories: [], priceRange: null });
-    setVisible(false);
+  const handleApplyFilters = (newFilters) => {
+    setFilters(newFilters);
+    // If modal has category filters, reset the top selector to 'All'
+    if (newFilters.categories && newFilters.categories.length > 0) setSelected('All');
   };
-
   return (
-    <>
-      <Modal transparent visible={visible} animationType="slide">
+    <ScreenComponent style={styles.container}>
+      <View style={styles.header}>
+        <View style={styles.iconBg}>
+          <Entypo name="grid" size={24} color="black" />
+        </View>
         <TouchableOpacity
-          onPress={() => setVisible(false)}
-          style={{
-            backgroundColor: 'rgba(0,0,0,0.5)',
-            height: height * 0.2,
+          style={styles.iconBg}
+          onPress={() => navigation.navigate('Notifications')}>
+          <Ionicons name="notifications-outline" size={24} color="black" />
+        </TouchableOpacity>
+      </View>
+
+      <SearchBar
+        onPress={() => setFilterModalVisible(true)}
+        value={searchQuery}
+        onChangeText={setSearchQuery}
+      />
+      <ScrollView
+        contentContainerStyle={{ paddingBottom: spacingY._60 }}
+        showsVerticalScrollIndicator={false}>
+        <ImageSlideShow />
+
+        <FlatList
+          data={categories}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.catContainer}
+          keyExtractor={(item, index) => index.toString()}
+          renderItem={({ item, index }) => {
+            const isSelected = selected == item.name;
+            return (
+              <CategoryItem
+                item={item}
+                onPress={handleFilter}
+                isSelected={isSelected}
+                index={index}
+                key={index}
+              />
+            );
           }}
         />
-        <View activeOpacity={1} style={styles.container}>
-          <View style={styles.filters}>
-            <Typo size={25} style={{ fontWeight: '700' }}>
-              Filters
-            </Typo>
-            <TouchableOpacity style={styles.crossIcon} onPress={() => setVisible(false)}>
-              <Entypo name="cross" size={24} color="black" />
-            </TouchableOpacity>
-          </View>
-
-          <ScrollView
-            contentContainerStyle={{ paddingBottom: '15%' }}
-            showsVerticalScrollIndicator={false}>
-            <Heading title={'Category'} index={1} />
-            <Animated.ScrollView
-              horizontal
-              entering={FadeInDown.delay(1 * 130)
-                .duration(300)
-                .springify()
-                .damping(12)
-                .stiffness(80)}>
-              <FlatList
-                scrollEnabled={false}
-                data={CATEGORIES}
-                numColumns={3}
-                contentContainerStyle={{ gap: spacingY._10 }}
-                columnWrapperStyle={{ gap: spacingX._10 }}
-                keyExtractor={(item, index) => index.toString()}
-                renderItem={({ item, index }) => {
-                  return (
-                    <TouchableOpacity
-                      style={styles.listItem}
-                      onPress={() => handleSelectCategories(item)}>
-                      {selectedCategories.includes(item) ? (
-                        <AntDesign name="checkcircle" size={18} color={colors.primary} />
-                      ) : (
-                        <View style={styles.circle} />
-                      )}
-                      <Typo>{item}</Typo>
-                    </TouchableOpacity>
-                  );
-                }}
-              />
-            </Animated.ScrollView>
-            <Heading title={'Price Range'} index={2} />
-            <View>
-              <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                <Typo>₱{low}</Typo>
-                <Typo>₱{high}</Typo>
-              </View>
-            </View>
-            <Slider
-              minimumTrackTintColor={colors.themeColor}
-              maximumTrackTintColor={colors.lightGray}
-              minimumValue={0} // Always start from 0
-              maximumValue={maxPrice > 0 ? maxPrice : defaultMaxPrice} // Use dynamic maxPrice
-              thumbTintColor={colors.themeColor}
-              trackStyle={{ backgroundColor: colors.lightGray }}
-              value={[low, high]}
-              onValueChange={([low, high]) => {
-                setLow(parseInt(low));
-                setHigh(parseInt(high));
-              }}
-            />
-            <View style={styles.footer}>
-              <TouchableOpacity onPress={handleApply} style={[styles.footerButton]}>
-                <Typo size={13} style={{ color: colors.white, fontWeight: '600' }}>
-                  Show Results
-                </Typo>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={handleReset}
-                style={[styles.footerButton, { backgroundColor: colors.lighterGray }]}>
-                <Typo size={13} style={{ color: colors.black, fontWeight: '600' }}>
-                  Reset
-                </Typo>
-              </TouchableOpacity>
-            </View>
-          </ScrollView>
+        <View style={styles.headingContainer}>
+          <Typo size={18} style={{ fontWeight: '600' }}>
+            Products
+          </Typo>
+          {/* <Typo style={{ color: colors.gray }}>See all</Typo> */}
         </View>
-      </Modal>
-    </>
+        {/* <ScrollView horizontal contentContainerStyle={{ flexGrow: 1 }}> */}
+        {data.length > 0 && (
+          <FlatList
+            scrollEnabled={false}
+            numColumns={2}
+            data={data}
+            keyExtractor={(item) => item.id.toString()}
+            contentContainerStyle={{
+              gap: spacingX._20,
+              paddingHorizontal: spacingX._20,
+              paddingTop: spacingY._15,
+            }}
+            columnWrapperStyle={{ gap: spacingX._20 }}
+            renderItem={({ item, index }) => {
+              const isAdmin = user?.role === 'Admin';
+              const isInactiveAndAdmin = isAdmin && item.activate === false;
+              return (
+                <Animated.View
+                  key={item.id}
+                  style={isInactiveAndAdmin ? { opacity: 0.5 } : {}}
+                  entering={FadeInDown.delay(index * 120)
+                    .duration(600)
+                    .damping(13)
+                    .springify()}>
+                  <ProductCard
+                    item={item}
+                    isFavourite={favouriteIds.has(item.id)}
+                    onToggleFavourite={() => handleToggleFavourite(item.id)}
+                  />
+                </Animated.View>
+              );
+            }}
+          />
+        )}
+
+        {/* </ScrollView> */}
+      </ScrollView>
+      <FilterModal
+        visible={filterModalVisible}
+        setVisible={setFilterModalVisible}
+        maxPrice={maxProductPrice}
+        onApplyFilters={handleApplyFilters}
+      />
+    </ScreenComponent>
   );
 }
-
-const Heading = ({ title, index }) => {
-  return (
-    <Animated.View
-      style={{ marginBottom: 11 }}
-      entering={FadeInDown.delay(index * 130)
-        .duration(300)
-        .springify()
-        .damping(12)
-        .stiffness(80)}>
-      <Typo size={16} style={styles.heading}>
-        {title}
-      </Typo>
-      {/* <View style={styles.line} /> */}
-    </Animated.View>
-  );
-};
-
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    paddingBottom: spacingY._20,
     backgroundColor: colors.white,
-    borderTopRightRadius: radius._20,
-    borderTopLeftRadius: radius._20,
-    marginTop: -spacingY._20,
+  },
+  header: {
+    flexDirection: 'row',
     paddingHorizontal: spacingX._20,
+    padding: spacingY._5,
+    justifyContent: 'space-between',
   },
-  heading: {
-    fontWeight: '700',
-    marginTop: spacingY._20,
-  },
-  crossIcon: {
+  iconBg: {
     backgroundColor: colors.lighterGray,
+    padding: spacingY._7,
     borderRadius: radius._20,
-    padding: spacingY._5,
+  },
+  catContainer: {
+    paddingHorizontal: spacingX._10,
     marginTop: spacingY._10,
   },
-  line: {
-    height: normalizeY(1),
-    backgroundColor: colors.lightGray,
-    marginVertical: spacingY._10,
-  },
-  circle: {
-    height: normalizeY(17),
-    width: normalizeY(17),
-    borderRadius: radius._10,
-    borderWidth: normalizeY(1),
-    borderColor: colors.lightGray,
-  },
-  listItem: {
-    flexDirection: 'row',
-    borderWidth: 1,
-    padding: spacingY._5,
-    paddingHorizontal: spacingY._7,
-    borderRadius: spacingY._20,
-    gap: spacingX._5,
-    borderColor: colors.lightGray,
-  },
-  footer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    gap: 10,
-  },
-  footerButton: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+  catImg: {
     height: normalizeY(50),
-    backgroundColor: colors.primary,
-    marginTop: spacingY._10,
-    borderRadius: radius._15,
-    borderCurve: 'continuous',
+    width: normalizeY(50),
+    borderRadius: radius._30,
+    backgroundColor: colors.lighterGray,
+    borderWidth: normalizeY(2),
+    marginBottom: spacingY._5,
   },
-  filters: {
+  catName: {
+    textAlign: 'center',
+    fontWeight: '500',
+  },
+  headingContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginTop: 10,
-    marginBottom: spacingY._5,
+    marginTop: spacingY._20,
+    marginHorizontal: spacingX._15,
   },
 });
 
-export default FilterModal;
+export default HomeScreen;
