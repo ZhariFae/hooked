@@ -94,20 +94,10 @@ function SigninScreen(props) {
           disabled={Auth.loading}
           style={{ backgroundColor: colors.primary, borderRadius: radius._12 }}
         />
-        <View style={styles.orContinueRow}>
-          <View style={styles.line} />
-          <Typo>or continue with</Typo>
-          <View style={styles.line} />
-        </View>
-        <View style={[styles.orContinueRow, { width: '85%', gap: spacingX._15 }]}>
-          <Icon icon={require('../assets/google.png')} />
-          <Icon icon={require('../assets/apple.png')} />
-          <Icon icon={require('../assets/facebook.png')} />
-        </View>
         <TouchableOpacity
           style={[styles.orContinueRow, { gap: spacingX._5, marginTop: '15%' }]}
           onPress={() => navigation.navigate('Register')}>
-          <Typo>Not a memeber?</Typo>
+          <Typo>Not a member?</Typo>
           <Typo style={{ color: colors.blue }}>Register now</Typo>
         </TouchableOpacity>
       </BlurView>

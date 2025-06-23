@@ -24,6 +24,7 @@ function HomeScreen({ navigation }) {
   const [allProducts, setAllProducts] = useState([]);
   const [data, setData] = useState([]);
   const [favouriteIds, setFavouriteIds] = useState(new Set());
+  const [searchQuery, setSearchQuery] = useState('');
 
   const loadData = useCallback(async () => {
     // Fetch products
@@ -31,20 +32,30 @@ function HomeScreen({ navigation }) {
     const visibleProducts =
       user?.role === 'Admin' ? productList : productList.filter((p) => p.activate);
     setAllProducts(visibleProducts);
-    if (selected === 'All') {
-      setData(visibleProducts);
-    }
 
     // Fetch favourites
     if (user) {
       const favIds = await getFavouriteIds(user.uid);
       setFavouriteIds(new Set(favIds));
     }
-  }, [user, selected]);
+  }, [user]);
 
   useEffect(() => {
     loadData();
   }, [loadData]);
+
+  useEffect(() => {
+    let filteredProducts = allProducts;
+    if (selected !== 'All') {
+      filteredProducts = filteredProducts.filter((item) => item.category === selected);
+    }
+    if (searchQuery) {
+      filteredProducts = filteredProducts.filter((item) =>
+        item.name.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+    setData(filteredProducts);
+  }, [searchQuery, selected, allProducts]);
 
   useFocusEffect(
     useCallback(() => {
@@ -65,15 +76,6 @@ function HomeScreen({ navigation }) {
 
   const handleFilter = (category) => {
     setSelected(category);
-    setData([]);
-    setTimeout(() => {
-      if (category === 'All') {
-        setData(allProducts);
-      } else {
-        const filteredData = allProducts.filter((item) => item.category === category);
-        setData(filteredData);
-      }
-    }, 50);
   };
   return (
     <ScreenComponent style={styles.container}>
@@ -88,7 +90,11 @@ function HomeScreen({ navigation }) {
         </TouchableOpacity>
       </View>
 
-      <SearchBar onPress={() => setFilterModalVisible(true)} />
+      <SearchBar
+        onPress={() => setFilterModalVisible(true)}
+        value={searchQuery}
+        onChangeText={setSearchQuery}
+      />
       <ScrollView
         contentContainerStyle={{ paddingBottom: spacingY._60 }}
         showsVerticalScrollIndicator={false}>

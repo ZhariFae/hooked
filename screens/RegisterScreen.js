@@ -105,20 +105,10 @@ function RegisterScreen(props) {
             marginTop: spacingY._40,
           }}
         />
-        <View style={styles.orContinueRow}>
-          <View style={styles.line} />
-          <Typo>or continue with</Typo>
-          <View style={styles.line} />
-        </View>
-        <View style={[styles.orContinueRow, { width: '85%', gap: spacingX._15 }]}>
-          <Icon icon={require('../assets/google.png')} />
-          <Icon icon={require('../assets/apple.png')} />
-          <Icon icon={require('../assets/facebook.png')} />
-        </View>
         <TouchableOpacity
           style={[styles.orContinueRow, { gap: spacingX._5, marginTop: '15%' }]}
           onPress={() => navigation.navigate('Signin')}>
-          <Typo>Already a memeber?</Typo>
+          <Typo>Already a member?</Typo>
           <Typo style={{ color: colors.blue }}>Sign In</Typo>
         </TouchableOpacity>
       </BlurView>

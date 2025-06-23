@@ -4,11 +4,16 @@ import { radius, spacingX, spacingY } from 'config/spacing';
 import { Feather, Octicons } from '@expo/vector-icons';
 import colors from 'config/colors';
 
-function SearchBar({ onPress }) {
+function SearchBar({ onPress, value, onChangeText }) {
   return (
     <View style={styles.searchbar}>
       <Feather name="search" size={24} color="black" />
-      <TextInput placeholder="Search..." style={styles.input} />
+      <TextInput
+        placeholder="Search..."
+        style={styles.input}
+        value={value}
+        onChangeText={onChangeText}
+      />
       <TouchableOpacity onPress={onPress}>
         <Octicons name="filter" size={20} color="black" />
       </TouchableOpacity>
