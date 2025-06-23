@@ -45,28 +45,10 @@ function CheckoutScreen({ route }) {
           Payment method
         </Typo>
         <MethodRow
-          title={'Credit Card'}
+          title={'GCash'}
           selected={selectedMethod}
           setSelected={setSelectedMethod}
-          img={require('../assets/visa.png')}
-        />
-        <MethodRow
-          title={'PayPal'}
-          selected={selectedMethod}
-          setSelected={setSelectedMethod}
-          img={require('../assets/paypal.png')}
-        />
-        <MethodRow
-          title={'Google Pay'}
-          selected={selectedMethod}
-          setSelected={setSelectedMethod}
-          img={require('../assets/google.png')}
-        />
-        <MethodRow
-          title={'Apple Pay'}
-          selected={selectedMethod}
-          setSelected={setSelectedMethod}
-          img={require('../assets/apple.png')}
+          img={require('../assets/gcash.png')}
         />
       </ScrollView>
 
