@@ -1,7 +1,7 @@
-import React from 'react';
-import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
+import React, { useState, useEffect } from 'react';
+import { MaterialIcons } from '@expo/vector-icons';
 import colors from 'config/colors';
-import { View, Image, Dimensions, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Image, Dimensions, StyleSheet, TouchableOpacity, TextInput, Alert } from 'react-native';
 import Typo from './Typo';
 import { normalizeX, normalizeY } from 'utils/normalize';
 import { spacingY } from 'config/spacing';
@@ -9,6 +9,20 @@ const { width } = Dimensions.get('screen');
 
 function CartCard({ item, onQuantityChange }) {
   const imgSize = width * 0.2;
+  const confirmRemove = () => {
+    Alert.alert(
+      'Remove Item',
+      'Are you sure you want to remove this item?',
+      [{text: 'Cancel', style: 'cancel'}, {text:'Remove', onPress: () => onQuantityChange(0) }],
+      {cancelable: false}
+    );
+  }
+  const [quantity, setQuantity] = useState(item.quantity);
+
+  useEffect(() => {
+    setQuantity(item.quantity);
+  }, [item.quantity]);
+
   return (
     <View style={styles.container}>
       <View style={styles.imgContainer}>
@@ -26,20 +40,29 @@ function CartCard({ item, onQuantityChange }) {
           <Typo size={17} style={{ fontWeight: 'bold' }}>
             {item.name}
           </Typo>
-          <TouchableOpacity onPress={() => onQuantityChange(0)}>
+          <TouchableOpacity onPress={confirmRemove}>
             <MaterialIcons name="delete-outline" size={normalizeY(24)} color={colors.primary} />
           </TouchableOpacity>
         </View>
         <Typo style={styles.catText}>{item.category}</Typo>
         <View style={styles.row}>
           <Typo style={{ fontWeight: 'bold' }}>₱{item.price}</Typo>
-          <View style={styles.countContanier}>
-            <TouchableOpacity onPress={() => onQuantityChange(item.quantity - 1)}>
-              <Typo style={{ fontWeight: 'bold' }}>-</Typo>
+          <View style={styles.quantityControl}>
+            <TouchableOpacity onPress={() => onQuantityChange(quantity - 1)}>
+              <Typo style={styles.quantityButton}>-</Typo>
             </TouchableOpacity>
-            <Typo style={{ fontWeight: 'bold' }}>{item.quantity}</Typo>
-            <TouchableOpacity onPress={() => onQuantityChange(item.quantity + 1)}>
-              <Typo style={{ fontWeight: 'bold' }}>+</Typo>
+            <TextInput style={styles.quantityInput} keyboardType="numeric"              
+              value={quantity.toString()}
+              onChangeText={(text) => {
+                setQuantity(text); 
+                if (text === "") return; 
+                const newQuantity = parseInt(text);
+                if (!isNaN(newQuantity)) 
+                  onQuantityChange(newQuantity);
+              }}
+            />
+            <TouchableOpacity onPress={() => onQuantityChange(quantity + 1)}>
+              <Typo style={styles.quantityButton}>+</Typo>
             </TouchableOpacity>
           </View>
         </View>
@@ -76,15 +99,28 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: normalizeY(3),
   },
-  countContanier: {
-    backgroundColor: colors.grayBG,
-    width: '35%',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-around',
-    padding: normalizeY(5),
-    borderRadius: normalizeY(20),
-  },
+  quantityControl: {
+        backgroundColor: colors.grayBG,
+        borderRadius: normalizeY(20),
+        paddingVertical: normalizeY(5),
+        paddingHorizontal: normalizeX(10),
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        width: normalizeX(100),
+    },
+    quantityButton: {
+        fontWeight: 'bold',
+        fontSize: normalizeY(16),
+        paddingHorizontal: normalizeX(8),
+    },
+    quantityInput: {
+        minWidth: normalizeX(30),
+        textAlign: 'center',
+        paddingHorizontal: normalizeX(5),
+        fontSize: normalizeY(16),
+        fontWeight: 'bold',
+    },
 });
 
 export default CartCard;

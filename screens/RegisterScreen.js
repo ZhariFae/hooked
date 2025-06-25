@@ -38,6 +38,7 @@ function RegisterScreen(props) {
     }
     try {
       await Auth.signup(name, email, password);
+      Alert.alert('Successful', 'Registration Successful!');
     } catch (error) {
       Alert.alert('Registration Failed.', error.message);
     }

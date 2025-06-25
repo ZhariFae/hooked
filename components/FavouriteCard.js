@@ -1,5 +1,5 @@
 import React from 'react';
-import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons } from '@expo/vector-icons';
 import colors from 'config/colors';
 import { View, Image, Dimensions, StyleSheet, TouchableOpacity } from 'react-native';
 import Typo from './Typo';
@@ -7,10 +7,21 @@ import { normalizeX, normalizeY } from 'utils/normalize';
 import { spacingY } from 'config/spacing';
 import { useNavigation } from '@react-navigation/native';
 const { width } = Dimensions.get('screen');
+import { Alert } from 'react-native';
 
 function FavouriteCard({ item, onRemove }) {
   const navigation = useNavigation();
   const imgSize = width * 0.2;
+
+  const confirmRemove = () => {
+    Alert.alert(
+      'Remove from Favorites',
+      'Are you sure you want to remove this item from your favorites?',
+      [{ text: 'Cancel', style: 'cancel' }, { text: 'Remove', onPress: onRemove }],
+      { cancelable: false }
+    );
+  };
+
   return (
     <TouchableOpacity
       style={styles.container}
@@ -30,7 +41,7 @@ function FavouriteCard({ item, onRemove }) {
           <Typo size={17} style={{ fontWeight: 'bold' }}>
             {item.name}
           </Typo>
-          <TouchableOpacity onPress={onRemove}>
+          <TouchableOpacity onPress={confirmRemove}>
             <MaterialIcons name="delete-outline" size={normalizeY(24)} color={colors.primary} />
           </TouchableOpacity>
         </View>

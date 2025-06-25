@@ -93,7 +93,6 @@ function CartScreen({ navigation }) {
           borderTopLeftRadius: radius._20,
         }}>
         <View style={styles.checkoutContainer}>
-          {/* Discount row removed */}
           <Row title={'Subtotal'} price={`₱${total.toFixed(2)}`} />
           <View style={styles.separator} />
           <Row title={'Total'} price={`₱${total.toFixed(2)}`} />
