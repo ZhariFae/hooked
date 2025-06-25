@@ -21,6 +21,7 @@ import useAuth from 'auth/useAuth';
 import { useCallback } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import { addUserAddress, getUserAddresses } from 'services/userDataService';
+import { formatPrice } from 'utils/format';
 
 function CheckoutScreen({ route }) {
   const { cartTotal } = route.params;
@@ -111,11 +112,11 @@ function CheckoutScreen({ route }) {
       </ScrollView>
 
       <View style={styles.checkoutContainer}>
-        <Row title={'Shipping fee'} price={`₱${shippingFee.toFixed(2)}`} />
+        <Row title={'Shipping fee'} price={`₱${formatPrice(shippingFee)}`} />
         <View style={styles.separator} />
-        <Row title={'Subtotal'} price={`₱${subtotal.toFixed(2)}`} />
+        <Row title={'Subtotal'} price={`₱${formatPrice(subtotal)}`} />
         <View style={styles.separator} />
-        <Row title={'Total'} price={`₱${finalTotal.toFixed(2)}`} />
+        <Row title={'Total'} price={`₱${formatPrice(finalTotal)}`} />
         <AppButton label={'Payment'} disabled={!selectedAddress} />
       </View>
       <AddressModal

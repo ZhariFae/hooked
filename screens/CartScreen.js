@@ -20,6 +20,7 @@ import Animated, { FadeInDown } from 'react-native-reanimated';
 import { getCartProducts, updateCartItemQuantity } from 'services/userDataService';
 import { normalizeX, normalizeY } from 'utils/normalize';
 import useAuth from 'auth/useAuth';
+import { formatPrice } from 'utils/format';
 
 function CartScreen({ navigation }) {
   const [products, setProducts] = useState([]);
@@ -93,9 +94,9 @@ function CartScreen({ navigation }) {
           borderTopLeftRadius: radius._20,
         }}>
         <View style={styles.checkoutContainer}>
-          <Row title={'Subtotal'} price={`₱${total.toFixed(2)}`} />
+          <Row title={'Subtotal'} price={`₱${formatPrice(total)}`} />
           <View style={styles.separator} />
-          <Row title={'Total'} price={`₱${total.toFixed(2)}`} />
+          <Row title={'Total'} price={`₱${formatPrice(total)}`} />
           <AppButton
             label={'Checkout'}
             onPress={() => navigation.navigate('Checkout', { cartTotal: total })}

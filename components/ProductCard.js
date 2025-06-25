@@ -6,6 +6,7 @@ import { Dimensions, Image, View, StyleSheet, TouchableOpacity } from 'react-nat
 import Typo from './Typo';
 import { normalizeY } from 'utils/normalize';
 import { useNavigation } from '@react-navigation/native';
+import { formatPrice } from 'utils/format';
 const { width, height } = Dimensions.get('screen');
 
 function ProductCard({ item, isFavourite, onToggleFavourite }) {
@@ -23,7 +24,7 @@ function ProductCard({ item, isFavourite, onToggleFavourite }) {
       </Typo>
       <View style={styles.dotsContainer}>
         <Typo size={13} style={{ fontWeight: '600' }}>
-          ₱ {item.price}
+          ₱ {formatPrice(item.price)}
         </Typo>
       </View>
     </TouchableOpacity>

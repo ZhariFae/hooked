@@ -19,6 +19,7 @@ import {
 } from 'react-native';
 import { isFavourite, toggleFavourite, addToCart } from 'services/userDataService';
 import { normalizeX, normalizeY } from 'utils/normalize';
+import { formatPrice } from 'utils/format';
 const { height } = Dimensions.get('screen');
 
 function ItemDetailsScreen({ route, navigation }) {
@@ -73,7 +74,7 @@ function ItemDetailsScreen({ route, navigation }) {
             {item.name}
           </Typo>
           <Typo size={20} style={styles.price}>
-            ₱ {item.price}
+            ₱ {formatPrice(item.price)}
           </Typo>
           <Typo size={16} style={styles.seller}>
             Seller: Aliyah Picazo
@@ -120,14 +121,18 @@ function ItemDetailsScreen({ route, navigation }) {
               keyboardType="numeric" 
               value={quantity.toString()} 
               onChangeText={(text) => {
-                const newQuantity = parseInt(text);
-                if (!isNaN(newQuantity) && newQuantity >= 1) {
+                // If the input is cleared, default the quantity to 1 for safety.
+                if (text === '') {
+                  setQuantity(1);
+                  return;
+                }
+                const newQuantity = parseInt(text, 10);
+                // Update state only if the parsed text is a valid number greater than 0.
+                if (!isNaN(newQuantity) && newQuantity > 0) {
                   setQuantity(newQuantity);
-                } else if (text === "") {
-                  setQuantity(1); 
                 }
               }}
-            ></TextInput>
+            />
             <Typo onPress={() => setQuantity(quantity + 1)} size={20} style={styles.count}>
               +
             </Typo>
@@ -237,17 +242,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-around',
     marginStart: spacingX._5,
+    paddingVertical: 0,
   },
   count: {
     color: colors.white,
     fontWeight: '600',
   },
   quantityInput: {
-    minWidth: normalizeX(30), // Ensure enough width for the input
+    minWidth: normalizeX(50), 
+    paddingVertical: 0, 
     textAlign: 'center',
-    fontSize: normalizeY(20), // Match the size of the surrounding Typo components
-    fontWeight: '600', // Match the font weight
-    color: colors.white, // Match the text color
+    fontSize: normalizeY(20),
+    fontWeight: '600', 
+    color: colors.white, 
   },
 });
 export default ItemDetailsScreen;

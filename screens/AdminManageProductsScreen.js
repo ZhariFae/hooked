@@ -19,6 +19,7 @@ import { products as fetchProducts } from 'utils/data';
 import { deleteProduct, toggleProductActivation } from 'services/productService';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { normalizeY } from 'utils/normalize';
+import { formatPrice } from 'utils/format';
 
 function AdminManageProductsScreen() {
   const navigation = useNavigation();
@@ -90,7 +91,7 @@ function AdminManageProductsScreen() {
           {item.name}
         </Typo>
         <Typo size={14} style={styles.productPrice}>
-          ₱{item.price.toFixed(2)}
+          ₱{formatPrice(item.price)}
         </Typo>
         <View style={styles.statusContainer}>
           <Typo style={{ color: item.activate ? colors.primary : '#d9534f' }}>

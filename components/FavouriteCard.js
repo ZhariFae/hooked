@@ -7,6 +7,7 @@ import { normalizeX, normalizeY } from 'utils/normalize';
 import { spacingY } from 'config/spacing';
 import { useNavigation } from '@react-navigation/native';
 const { width } = Dimensions.get('screen');
+import { formatPrice } from 'utils/format';
 import { Alert } from 'react-native';
 
 function FavouriteCard({ item, onRemove }) {
@@ -46,7 +47,9 @@ function FavouriteCard({ item, onRemove }) {
           </TouchableOpacity>
         </View>
         <Typo style={styles.catText}>{item.category}</Typo>
-        <Typo style={{ fontWeight: 'bold' }}>₱ {item.price}</Typo>
+        <Typo style={{ fontWeight: 'bold' }}>
+          ₱ {formatPrice(item.price)}
+        </Typo>
       </View>
     </TouchableOpacity>
   );
