@@ -46,7 +46,7 @@ function CartCard({ item, onQuantityChange }) {
         </View>
         <Typo style={styles.catText}>{item.category}</Typo>
         <View style={styles.row}>
-          <Typo style={{ fontWeight: 'bold' }}>₱{item.price}</Typo>
+          <Typo style={{ fontWeight: 'bold' }}>₱{item.price.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</Typo>
           <View style={styles.quantityControl}>
             <TouchableOpacity onPress={() => onQuantityChange(quantity - 1)}>
               <Typo style={styles.quantityButton}>-</Typo>

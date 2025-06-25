@@ -14,6 +14,7 @@ import {
   Dimensions,
   ScrollView,
   TouchableOpacity,
+  TextInput, // Added TextInput for editable quantity
   Alert,
 } from 'react-native';
 import { isFavourite, toggleFavourite, addToCart } from 'services/userDataService';
@@ -113,10 +114,20 @@ function ItemDetailsScreen({ route, navigation }) {
               size={20}
               style={styles.count}>
               -
-            </Typo>
-            <Typo size={20} style={styles.count}>
-              {quantity}
-            </Typo>
+            </Typo>            
+            <TextInput
+              style={styles.quantityInput} 
+              keyboardType="numeric" 
+              value={quantity.toString()} 
+              onChangeText={(text) => {
+                const newQuantity = parseInt(text);
+                if (!isNaN(newQuantity) && newQuantity >= 1) {
+                  setQuantity(newQuantity);
+                } else if (text === "") {
+                  setQuantity(1); 
+                }
+              }}
+            ></TextInput>
             <Typo onPress={() => setQuantity(quantity + 1)} size={20} style={styles.count}>
               +
             </Typo>
@@ -230,6 +241,13 @@ const styles = StyleSheet.create({
   count: {
     color: colors.white,
     fontWeight: '600',
+  },
+  quantityInput: {
+    minWidth: normalizeX(30), // Ensure enough width for the input
+    textAlign: 'center',
+    fontSize: normalizeY(20), // Match the size of the surrounding Typo components
+    fontWeight: '600', // Match the font weight
+    color: colors.white, // Match the text color
   },
 });
 export default ItemDetailsScreen;
