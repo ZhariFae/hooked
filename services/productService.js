@@ -1,3 +1,21 @@
+/**
+ * Updates the price of a product in Firestore.
+ * @param {string} productId
+ * @param {number} newPrice
+ * @returns {Promise<{success: boolean}>}
+ */
+export const updateProductPrice = async (productId, newPrice) => {
+  try {
+    const productDocRef = doc(db, 'items', productId);
+    await updateDoc(productDocRef, {
+      price: newPrice,
+    });
+    return { success: true };
+  } catch (error) {
+    console.error('Error updating product price in Firestore:', error);
+    throw error;
+  }
+};
 import { collection, addDoc, doc, deleteDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../auth/firebaseAuth';
 
