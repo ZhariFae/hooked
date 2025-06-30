@@ -1,11 +1,9 @@
 import { collection, addDoc, doc, deleteDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../auth/firebaseAuth';
 
-// This service now interacts with Firebase Firestore.
-
 /**
- * Adds a new product to the 'items' collection in Firestore.
- * @param {object} productData - The product data to add.
+ * 
+ * @param {object} productData
  * @returns {Promise<{success: boolean, id: string}>}
  */
 export const addProduct = async (productData) => {
@@ -13,18 +11,18 @@ export const addProduct = async (productData) => {
     const itemsCol = collection(db, 'items');
     const newProductRef = await addDoc(itemsCol, {
       ...productData,
-      activate: true, // New products are active by default
+      activate: true, 
     });
     return { success: true, id: newProductRef.id };
   } catch (error) {
     console.error('Error adding product to Firestore:', error);
-    throw error; // Re-throw the error to be caught by the calling function
+    throw error;
   }
 };
 
 /**
- * Deletes a product from the 'items' collection in Firestore.
- * @param {string} productId - The ID of the product to delete.
+ *
+ * @param {string} productId
  * @returns {Promise<{success: boolean}>}
  */
 export const deleteProduct = async (productId) => {
@@ -39,9 +37,9 @@ export const deleteProduct = async (productId) => {
 };
 
 /**
- * Toggles the 'activate' status of a product in Firestore.
- * @param {string} productId - The ID of the product to update.
- * @param {boolean} currentStatus - The current 'activate' status of the product.
+ * 
+ * @param {string} productId
+ * @param {boolean} currentStatus
  * @returns {Promise<{success: boolean}>}
  */
 export const toggleProductActivation = async (productId, currentStatus) => {
