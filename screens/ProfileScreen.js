@@ -108,6 +108,17 @@ function ProfileScreen(props) {
             }
           />
           <Row
+            title={userRole === 'Admin' ? 'View Customer Inquiries' : 'Customer Inquiry'}
+            iconColor={'#fdf2f8'}
+            icon={
+              <MaterialCommunityIcons name="comment-question-outline" size={24} color={colors.black} />
+            }
+            index={userRole === 'Admin' ? 2 : 0}
+            onPress={() =>
+              navigation.navigate(userRole === 'Admin' ? 'AdminInquiry' : 'UserInquiry')
+            }
+          />
+          <Row
             title={'Log out'}
             iconColor={'#d1d1d1'}
             icon={<MaterialCommunityIcons name="logout" size={24} color={colors.black} />}
