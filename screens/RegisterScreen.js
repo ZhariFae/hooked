@@ -37,8 +37,12 @@ function RegisterScreen(props) {
       return;
     }
     try {
-      await Auth.signup(name, email, password);
-      Alert.alert('Successful', 'Registration Successful!');
+      const userCredential = await Auth.signup(name, email, password);
+      // Send confirmation email if available
+      if (userCredential && userCredential.user && userCredential.user.sendEmailVerification) {
+        await userCredential.user.sendEmailVerification();
+      }
+      Alert.alert('Successful', 'Registration Successful! A confirmation email has been sent.');
     } catch (error) {
       Alert.alert('Registration Failed.', error.message);
     }

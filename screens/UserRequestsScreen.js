@@ -8,7 +8,9 @@ import AppButton from 'components/AppButton';
 import colors from 'config/colors';
 import { spacingX, spacingY, radius } from 'config/spacing';
 import { getUserCustomRequests } from 'services/customRequestService';
+import { getProductByCustomRequestId } from 'services/productService';
 import useAuth from 'auth/useAuth';
+import { addToCart } from 'services/userDataService';
 
 const UserRequestsScreen = () => {
   const navigation = useNavigation();
@@ -21,7 +23,23 @@ const UserRequestsScreen = () => {
       setLoading(true);
       try {
         const userRequests = await getUserCustomRequests(user.uid);
-        setRequests(userRequests);
+        // For accepted requests, fetch the price from the product collection
+        const requestsWithPrice = await Promise.all(
+          userRequests.map(async (req) => {
+            if (req.status?.toLowerCase() === 'accepted') {
+              try {
+                const product = await getProductByCustomRequestId(req.id);
+                if (product && typeof product.price === 'number') {
+                  return { ...req, price: product.price };
+                }
+              } catch (e) {
+                // ignore error, fallback to no price
+              }
+            }
+            return req;
+          })
+        );
+        setRequests(requestsWithPrice);
       } catch (error) {
         console.error('Failed to load custom requests:', error);
         Alert.alert('Error', 'Could not fetch your requests.');
@@ -59,10 +77,36 @@ const UserRequestsScreen = () => {
           </Typo>
           <Typo style={styles.quantity}>Quantity: {item.quantity}</Typo>
         </View>
-        <View style={[styles.statusBadge, { backgroundColor: statusStyle.backgroundColor }]}>
-          <Typo style={[styles.statusText, { color: statusStyle.color }]}>
-            {item.status ? item.status.charAt(0).toUpperCase() + item.status.slice(1) : 'Pending'}
-          </Typo>
+        <View style={{ alignItems: 'flex-end' }}>
+          <View style={[styles.statusBadge, { backgroundColor: statusStyle.backgroundColor }]}> 
+            <Typo style={[styles.statusText, { color: statusStyle.color }]}> 
+              {item.status ? item.status.charAt(0).toUpperCase() + item.status.slice(1) : 'Pending'}
+            </Typo>
+          </View>
+          {item.status?.toLowerCase() === 'accepted' && (
+            <View style={styles.priceAndCartRow}>
+              {typeof item.price === 'number' && (
+                <Typo style={styles.priceText}>₱{item.price.toFixed(2)}</Typo>
+              )}
+              <AppButton
+                label="Add to Cart"
+                style={styles.addToCartButton}
+                onPress={async () => {
+                  if (user) {
+                    // Fetch the product to get its real productId
+                    const product = await getProductByCustomRequestId(item.id);
+                    if (product && product.id) {
+                      await addToCart(user.uid, product.id, item.quantity);
+                      Alert.alert('Success', `${item.quantity} x ${item.description} added to cart!`);
+                      navigation.navigate('Cart');
+                    } else {
+                      Alert.alert('Error', 'Product not found. Please try again later.');
+                    }
+                  }
+                }}
+              />
+            </View>
+          )}
         </View>
       </View>
     );
@@ -123,6 +167,9 @@ const styles = StyleSheet.create({
   statusBadge: { paddingVertical: spacingY._5, paddingHorizontal: spacingX._10, borderRadius: radius._20 },
   statusText: { fontWeight: 'bold', fontSize: 12 },
   newRequestButton: { margin: spacingX._15, backgroundColor: colors.primary },
+  addToCartButton: { marginTop: spacingY._10, backgroundColor: colors.primary, paddingHorizontal: 10, paddingVertical: 5 },
+  priceAndCartRow: { flexDirection: 'row', alignItems: 'center', marginTop: spacingY._10 },
+  priceText: { fontWeight: 'bold', fontSize: 15, color: colors.primary, marginRight: spacingX._10 },
 });
 
 export default UserRequestsScreen;

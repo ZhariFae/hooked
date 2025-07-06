@@ -1,5 +1,4 @@
 import { MaterialIcons } from '@expo/vector-icons';
-import AppButton from 'components/AppButton';
 import Header from 'components/Header';
 import ScreenComponent from 'components/ScreenComponent';
 import Typo from 'components/Typo';
@@ -22,6 +21,7 @@ import { useCallback } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import { addUserAddress, getUserAddresses } from 'services/userDataService';
 import { formatPrice } from 'utils/format';
+import GCashQrModalContent from 'components/GCashQrModalContent';
 
 function CheckoutScreen({ route }) {
   const { cartTotal } = route.params;
@@ -31,6 +31,7 @@ function CheckoutScreen({ route }) {
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [isAddressModalVisible, setAddressModalVisible] = useState(false);
   const [newAddress, setNewAddress] = useState({ title: '', phone: '', address: '' });
+  const [isGcashModalVisible, setGcashModalVisible] = useState(false);
 
   const shippingFee = 30.0;
   const subtotal = cartTotal;
@@ -117,7 +118,21 @@ function CheckoutScreen({ route }) {
         <Row title={'Subtotal'} price={`₱${formatPrice(subtotal)}`} />
         <View style={styles.separator} />
         <Row title={'Total'} price={`₱${formatPrice(finalTotal)}`} />
-        <AppButton label={'Payment'} disabled={!selectedAddress} />
+        <TouchableOpacity
+          style={[{
+            backgroundColor: selectedAddress ? colors.primary : colors.grayBG,
+            paddingVertical: spacingY._15,
+            borderRadius: radius._10,
+            alignItems: 'center',
+            marginTop: spacingY._15,
+          }]}
+          disabled={!selectedAddress}
+          onPress={() => setGcashModalVisible(true)}
+        >
+          <Typo style={{ color: selectedAddress ? colors.white : colors.gray, fontWeight: '600', fontSize: 18 }}>
+            Payment
+          </Typo>
+        </TouchableOpacity>
       </View>
       <AddressModal
         visible={isAddressModalVisible}
@@ -125,6 +140,11 @@ function CheckoutScreen({ route }) {
         onSave={handleAddAddress}
         address={newAddress}
         setAddress={setNewAddress}
+      />
+      <GcashModal
+        visible={isGcashModalVisible}
+        onClose={() => setGcashModalVisible(false)}
+        totalAmount={finalTotal}
       />
     </ScreenComponent>
   );
@@ -169,6 +189,25 @@ const AddressModal = ({ visible, onClose, onSave, address, setAddress }) => (
     </View>
   </Modal>
 );
+
+// GcashModal component encapsulates Modal and GCashQrModalContent
+const GcashModal = ({ visible, onClose, totalAmount }) => {
+  return (
+    <Modal
+      visible={visible}
+      transparent={true}
+      animationType="slide"
+      onRequestClose={onClose}
+    >
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.5)' }}>
+        <GCashQrModalContent
+          totalAmount={totalAmount}
+          onClose={onClose}
+        />
+      </View>
+    </Modal>
+  );
+};
 
 const Row = ({ title, price }) => {
   return (

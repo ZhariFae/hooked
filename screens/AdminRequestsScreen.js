@@ -7,6 +7,8 @@ import {
   ActivityIndicator,
   TouchableOpacity,
   RefreshControl,
+  Modal,
+  TextInput,
 } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import ScreenComponent from 'components/ScreenComponent';
@@ -15,12 +17,18 @@ import Header from 'components/Header';
 import colors from 'config/colors';
 import { spacingX, spacingY, radius } from 'config/spacing';
 import { getAllCustomRequests, updateRequestStatus } from 'services/customRequestService';
+import { addProduct } from 'services/productService';
 
 const AdminRequestsScreen = () => {
   const navigation = useNavigation();
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  // Modal state
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalRequest, setModalRequest] = useState(null);
+  const [priceInput, setPriceInput] = useState('');
+  const [addingProduct, setAddingProduct] = useState(false);
 
   const loadRequests = useCallback(async () => {
     if (!refreshing) setLoading(true);
@@ -50,7 +58,13 @@ const AdminRequestsScreen = () => {
   );
 
   // Function to handle accept/deny actions
-  const handleAction = async (requestId, newStatus) => {
+  const handleAction = async (requestId, newStatus, requestItem) => {
+    if (newStatus === 'accepted') {
+      setModalRequest({ ...requestItem, id: requestId });
+      setPriceInput('');
+      setModalVisible(true);
+      return;
+    }
     // Optimistic UI update
     const originalRequests = [...requests];
     setRequests((prevRequests) =>
@@ -68,6 +82,49 @@ const AdminRequestsScreen = () => {
       // Revert on error
       setRequests(originalRequests);
       Alert.alert('Error', `An error occurred while updating the request.`);
+    }
+  };
+
+  // Function to handle adding product after price input
+  const handleAddProduct = async () => {
+    if (!modalRequest || !priceInput) {
+      Alert.alert('Error', 'Please enter a price.');
+      return;
+    }
+    setAddingProduct(true);
+    // Optimistic UI update
+    const originalRequests = [...requests];
+    setRequests((prevRequests) =>
+      prevRequests.map((req) => (req.id === modalRequest.id ? { ...req, status: 'accepted' } : req))
+    );
+    try {
+      // Update request status first
+      const result = await updateRequestStatus(modalRequest.id, 'accepted');
+      if (!result.success) {
+        setRequests(originalRequests);
+        Alert.alert('Error', 'Failed to update request status.');
+        setAddingProduct(false);
+        return;
+      }
+      // Add product to Firebase
+      const productData = {
+        name: modalRequest.description,
+        description: modalRequest.description,
+        category: 'Custom Requests',
+        price: parseFloat(priceInput),
+        customRequestId: modalRequest.id,
+        userId: modalRequest.userId,
+      };
+      await addProduct(productData);
+      setModalVisible(false);
+      setModalRequest(null);
+      setPriceInput('');
+      Alert.alert('Success', 'Product added and request accepted.');
+    } catch (error) {
+      setRequests(originalRequests);
+      Alert.alert('Error', 'Failed to add product.');
+    } finally {
+      setAddingProduct(false);
     }
   };
 
@@ -95,8 +152,8 @@ const AdminRequestsScreen = () => {
           <Typo style={styles.quantity}>Quantity: {item.quantity}</Typo>
         </View>
         <View style={styles.statusAndActions}>
-          <View style={[styles.statusBadge, { backgroundColor: statusStyle.backgroundColor }]}>
-            <Typo style={[styles.statusText, { color: statusStyle.color }]}>
+          <View style={[styles.statusBadge, { backgroundColor: statusStyle.backgroundColor }]}> 
+            <Typo style={[styles.statusText, { color: statusStyle.color }]}> 
               {item.status ? item.status.charAt(0).toUpperCase() + item.status.slice(1) : 'Pending'}
             </Typo>
           </View>
@@ -104,12 +161,12 @@ const AdminRequestsScreen = () => {
             <View style={styles.buttonContainer}>
               <TouchableOpacity
                 style={[styles.actionButton, styles.acceptButton]}
-                onPress={() => handleAction(item.id, 'accepted')}>
+                onPress={() => handleAction(item.id, 'accepted', item)}>
                 <Typo style={styles.actionButtonText}>Accept</Typo>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.actionButton, styles.denyButton]}
-                onPress={() => handleAction(item.id, 'denied')}>
+                onPress={() => handleAction(item.id, 'denied', item)}>
                 <Typo style={styles.actionButtonText}>Deny</Typo>
               </TouchableOpacity>
             </View>
@@ -147,6 +204,55 @@ const AdminRequestsScreen = () => {
           </View>
         }
       />
+      {/* Modal for price input */}
+      <Modal
+        visible={modalVisible}
+        transparent
+        animationType="slide"
+        onRequestClose={() => {
+          if (!addingProduct) {
+            setModalVisible(false);
+            setModalRequest(null);
+            setPriceInput('');
+          }
+        }}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Typo style={styles.modalTitle}>Enter Price for Product</Typo>
+            <TextInput
+              style={styles.modalInput}
+              placeholder="Enter price"
+              keyboardType="numeric"
+              value={priceInput}
+              onChangeText={setPriceInput}
+              editable={!addingProduct}
+            />
+            <View style={styles.modalButtonRow}>
+              <TouchableOpacity
+                style={[styles.actionButton, styles.acceptButton, { flex: 1, opacity: addingProduct ? 0.7 : 1 }]}
+                onPress={handleAddProduct}
+                disabled={addingProduct}
+              >
+                <Typo style={styles.actionButtonText}>{addingProduct ? 'Adding...' : 'Confirm'}</Typo>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.actionButton, styles.denyButton, { flex: 1, marginLeft: 10, opacity: addingProduct ? 0.7 : 1 }]}
+                onPress={() => {
+                  if (!addingProduct) {
+                    setModalVisible(false);
+                    setModalRequest(null);
+                    setPriceInput('');
+                  }
+                }}
+                disabled={addingProduct}
+              >
+                <Typo style={styles.actionButtonText}>Cancel</Typo>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </ScreenComponent>
   );
 };
@@ -195,6 +301,41 @@ const styles = StyleSheet.create({
   acceptButton: { backgroundColor: colors.primary },
   denyButton: { backgroundColor: '#ef4444' },
   actionButtonText: { color: colors.white, fontWeight: '600', fontSize: 13 },
+  // Modal styles
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    backgroundColor: colors.white,
+    borderRadius: radius._12,
+    padding: 24,
+    width: '85%',
+    alignItems: 'stretch',
+    elevation: 5,
+  },
+  modalTitle: {
+    fontWeight: 'bold',
+    fontSize: 18,
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  modalInput: {
+    borderWidth: 1,
+    borderColor: colors.lightGray,
+    borderRadius: radius._8,
+    padding: 10,
+    fontSize: 16,
+    marginBottom: 20,
+    backgroundColor: colors.grayBG,
+  },
+  modalButtonRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
 });
 
 export default AdminRequestsScreen;

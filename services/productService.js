@@ -1,3 +1,25 @@
+import { query, where, getDocs } from 'firebase/firestore';
+/**
+ * Fetches a product from Firestore by customRequestId field.
+ * @param {string} customRequestId
+ * @returns {Promise<object|null>} The product object or null if not found
+ */
+export const getProductByCustomRequestId = async (customRequestId) => {
+  try {
+    const itemsCol = collection(db, 'items');
+    const q = query(itemsCol, where('customRequestId', '==', customRequestId));
+    const querySnapshot = await getDocs(q);
+    if (!querySnapshot.empty) {
+      // Return the first matching product
+      const docSnap = querySnapshot.docs[0];
+      return { id: docSnap.id, ...docSnap.data() };
+    }
+    return null;
+  } catch (error) {
+    console.error('Error fetching product by customRequestId:', error);
+    throw error;
+  }
+};
 /**
  * Updates the price of a product in Firestore.
  * @param {string} productId
@@ -29,7 +51,7 @@ export const addProduct = async (productData) => {
     const itemsCol = collection(db, 'items');
     const newProductRef = await addDoc(itemsCol, {
       ...productData,
-      activate: true, 
+      activate: false, 
     });
     return { success: true, id: newProductRef.id };
   } catch (error) {

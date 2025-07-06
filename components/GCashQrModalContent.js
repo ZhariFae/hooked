@@ -3,9 +3,9 @@ import React from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 
-import Typo from './Typo';
-import colors from '../config/colors';
-import { spacingX, spacingY, radius } from '../config/spacing';
+import Typo from 'components/Typo';
+import colors from 'config/colors';
+import { spacingX, spacingY, radius } from 'config/spacing';
 
 /**
  * GCashQrModalContent component displays the GCash QR code and payment details within a modal.
@@ -47,6 +47,8 @@ const GCashQrModalContent = ({ totalAmount, onClose }) => {
 const styles = StyleSheet.create({
   modalContent: {
     backgroundColor: colors.white,
+    borderWidth: 5,
+    borderColor: 'gray',
     padding: spacingX._20,
     borderRadius: radius._20,
     alignItems: 'center',
