@@ -14,10 +14,12 @@ import {
   TextInput,
   KeyboardAvoidingView,
   Platform,
+  Alert,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { getCartProducts, updateCartItemQuantity } from 'services/userDataService';
+import { submitCustomRequest } from 'services/customRequestService';
 import { normalizeX, normalizeY } from 'utils/normalize';
 import useAuth from 'auth/useAuth';
 import { formatPrice } from 'utils/format';
@@ -35,8 +37,39 @@ function CartScreen({ navigation }) {
   }, [user]);
 
   const handleQuantityChange = async (productId, newQuantity) => {
-    await updateCartItemQuantity(user.uid, productId, newQuantity);
-    loadCart(); // Refresh cart
+    // Find the product details
+    const product = products.find((p) => p.id === productId);
+    if (newQuantity > 99 && product) {
+      // Use setTimeout to ensure Alert shows before any state update or async
+      setTimeout(() => {
+        Alert.alert(
+          'Large Order Notice',
+          'Orders above 99 units may take longer to ship. Your request will be reviewed by an admin.',
+          [
+            {
+              text: 'OK',
+              onPress: async () => {
+                try {
+                  await submitCustomRequest(
+                    user.uid,
+                    user.displayName || user.email || 'User',
+                    {
+                      description: `Bulk order for ${product.name || product.title || 'product'} (Product ID: ${productId})`,
+                      quantity: newQuantity,
+                      productId: productId,
+                    }
+                  );
+                  Alert.alert('Request Sent', 'Your bulk order request has been sent to the admin. Please check the custom requests found on your profile for any updates.');
+                } catch (e) {
+                  Alert.alert('Error', 'Failed to send custom request.');
+                }
+              },
+            },
+          ]
+        );
+      }, 100);
+      return;
+    }
   };
 
   useEffect(() => {

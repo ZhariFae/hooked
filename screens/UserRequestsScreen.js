@@ -77,34 +77,58 @@ const UserRequestsScreen = () => {
           </Typo>
           <Typo style={styles.quantity}>Quantity: {item.quantity}</Typo>
         </View>
-        <View style={{ alignItems: 'flex-end' }}>
-          <View style={[styles.statusBadge, { backgroundColor: statusStyle.backgroundColor }]}> 
-            <Typo style={[styles.statusText, { color: statusStyle.color }]}> 
+        <View style={styles.rightColumn}>
+          <View style={[styles.statusBadge, { backgroundColor: statusStyle.backgroundColor, alignSelf: 'flex-end', maxWidth: 120 }]}> 
+            <Typo style={[styles.statusText, { color: statusStyle.color }]} numberOfLines={1} ellipsizeMode="tail"> 
               {item.status ? item.status.charAt(0).toUpperCase() + item.status.slice(1) : 'Pending'}
             </Typo>
           </View>
           {item.status?.toLowerCase() === 'accepted' && (
             <View style={styles.priceAndCartRow}>
               {typeof item.price === 'number' && (
-                <Typo style={styles.priceText}>₱{item.price.toFixed(2)}</Typo>
+                <Typo style={styles.priceText} numberOfLines={1} ellipsizeMode="tail">₱{item.price.toFixed(2)}</Typo>
               )}
-              <AppButton
-                label="Add to Cart"
-                style={styles.addToCartButton}
+              <TouchableOpacity
+                style={[styles.statusBadge, styles.addToCartTouchable, { backgroundColor: statusStyle.backgroundColor }]}
+                activeOpacity={0.7}
                 onPress={async () => {
                   if (user) {
                     // Fetch the product to get its real productId
                     const product = await getProductByCustomRequestId(item.id);
                     if (product && product.id) {
-                      await addToCart(user.uid, product.id, item.quantity);
-                      Alert.alert('Success', `${item.quantity} x ${item.description} added to cart!`);
+                      // Check if product is already in cart
+                      const { getCartProducts, updateCartItemQuantity } = await import('services/userDataService');
+                      const cartProducts = await getCartProducts(user.uid);
+                      const cartItem = cartProducts.find((p) => p.id === product.id);
+                      // Calculate per-unit price if admin input is total price for all units
+                      let perUnitPrice = product.price;
+                      if (product.customRequestId && item.quantity && product.price && product.price > 0) {
+                        // If price is total for all units, divide by quantity
+                        perUnitPrice = product.price;
+                        if (product.quantity && product.quantity > 0) {
+                          perUnitPrice = product.price;
+                        } else if (item.quantity > 0) {
+                          perUnitPrice = product.price / item.quantity;
+                        }
+                      }
+                      // Overwrite product price in cart if needed
+                      if (cartItem) {
+                        await updateCartItemQuantity(user.uid, product.id, cartItem.quantity + item.quantity);
+                        Alert.alert('Updated', `Cart updated: ${cartItem.quantity + item.quantity} x ${item.description}`);
+                      } else {
+                        // Set per-unit price in cart if needed (optional, depends on cart implementation)
+                        await addToCart(user.uid, product.id, item.quantity);
+                        Alert.alert('Success', `${item.quantity} x ${item.description} added to cart!`);
+                      }
                       navigation.navigate('Cart');
                     } else {
                       Alert.alert('Error', 'Product not found. Please try again later.');
                     }
                   }
                 }}
-              />
+              >
+                <Typo style={[styles.statusText, { color: statusStyle.color, fontWeight: 'bold', fontSize: 12 }]} numberOfLines={1} ellipsizeMode="tail">Add to Cart</Typo>
+              </TouchableOpacity>
             </View>
           )}
         </View>
@@ -168,8 +192,10 @@ const styles = StyleSheet.create({
   statusText: { fontWeight: 'bold', fontSize: 12 },
   newRequestButton: { margin: spacingX._15, backgroundColor: colors.primary },
   addToCartButton: { marginTop: spacingY._10, backgroundColor: colors.primary, paddingHorizontal: 10, paddingVertical: 5 },
-  priceAndCartRow: { flexDirection: 'row', alignItems: 'center', marginTop: spacingY._10 },
-  priceText: { fontWeight: 'bold', fontSize: 15, color: colors.primary, marginRight: spacingX._10 },
+  rightColumn: { alignItems: 'flex-end', flexShrink: 1, minWidth: 120, maxWidth: 150 },
+  priceAndCartRow: { flexDirection: 'row', alignItems: 'center', marginTop: spacingY._10, flexWrap: 'wrap', maxWidth: 180 },
+  priceText: { fontWeight: 'bold', fontSize: 15, color: colors.primary, marginRight: spacingX._10, maxWidth: 70 },
+  addToCartTouchable: { marginLeft: 0, marginTop: 0, flexDirection: 'row', alignItems: 'center', paddingVertical: 6, paddingHorizontal: 10, maxWidth: 90 },
 });
 
 export default UserRequestsScreen;

@@ -92,7 +92,6 @@ const AdminRequestsScreen = () => {
       return;
     }
     setAddingProduct(true);
-    // Optimistic UI update
     const originalRequests = [...requests];
     setRequests((prevRequests) =>
       prevRequests.map((req) => (req.id === modalRequest.id ? { ...req, status: 'accepted' } : req))
@@ -106,12 +105,15 @@ const AdminRequestsScreen = () => {
         setAddingProduct(false);
         return;
       }
-      // Add product to Firebase
+      // Calculate per-unit price if admin input is total price for all units
+      const totalPrice = parseFloat(priceInput);
+      const quantity = modalRequest.quantity || 1;
+      const perUnitPrice = quantity > 0 ? totalPrice / quantity : totalPrice;
       const productData = {
         name: modalRequest.description,
         description: modalRequest.description,
         category: 'Custom Requests',
-        price: parseFloat(priceInput),
+        price: perUnitPrice,
         customRequestId: modalRequest.id,
         userId: modalRequest.userId,
       };
@@ -119,7 +121,7 @@ const AdminRequestsScreen = () => {
       setModalVisible(false);
       setModalRequest(null);
       setPriceInput('');
-      Alert.alert('Success', 'Product added and request accepted.');
+      Alert.alert('Success', 'Product added and request accepted. (Per unit price: ₱' + perUnitPrice.toFixed(2) + ')');
     } catch (error) {
       setRequests(originalRequests);
       Alert.alert('Error', 'Failed to add product.');
