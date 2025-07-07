@@ -8,16 +8,26 @@ import { spacingY } from 'config/spacing';
 import { formatPrice } from 'utils/format';
 const { width } = Dimensions.get('screen');
 
-function CartCard({ item, onQuantityChange }) {
+function CartCard({ item, onQuantityChange, onRemove }) {
   const imgSize = width * 0.2;
   const confirmRemove = () => {
     Alert.alert(
       'Remove Item',
       'Are you sure you want to remove this item?',
-      [{text: 'Cancel', style: 'cancel'}, {text:'Remove', onPress: () => onQuantityChange(0) }],
-      {cancelable: false}
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Remove', onPress: () => {
+            if (onRemove) {
+              onRemove();
+            } else {
+              onQuantityChange(0);
+            }
+          }
+        }
+      ],
+      { cancelable: false }
     );
-  }
+  };
   const [quantity, setQuantity] = useState(item.quantity);
 
   useEffect(() => {

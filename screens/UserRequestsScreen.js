@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { View, StyleSheet, FlatList, Alert, ActivityIndicator } from 'react-native';
+import { View, StyleSheet, FlatList, Alert, ActivityIndicator, TouchableOpacity } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import ScreenComponent from 'components/ScreenComponent';
 import Typo from 'components/Typo';

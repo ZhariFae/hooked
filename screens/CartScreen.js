@@ -54,7 +54,7 @@ function CartScreen({ navigation }) {
                     user.uid,
                     user.displayName || user.email || 'User',
                     {
-                      description: `Bulk order for ${product.name || product.title || 'product'} (Product ID: ${productId})`,
+                      description: `Bulk order for ${product.name || product.title || 'product'}`,
                       quantity: newQuantity,
                       productId: productId,
                     }
@@ -113,6 +113,15 @@ function CartScreen({ navigation }) {
                 <CartCard
                   item={item}
                   onQuantityChange={(newQuantity) => handleQuantityChange(item.id, newQuantity)}
+                  onRemove={async () => {
+                    // Remove item from cart
+                    if (user) {
+                      const { updateCartItemQuantity } = await import('services/userDataService');
+                      await updateCartItemQuantity(user.uid, item.id, 0);
+                      // Refresh cart
+                      loadCart();
+                    }
+                  }}
                 />
               </Animated.View>
             );

@@ -17,7 +17,7 @@ import Header from 'components/Header';
 import colors from 'config/colors';
 import { spacingX, spacingY, radius } from 'config/spacing';
 import { getAllCustomRequests, updateRequestStatus } from 'services/customRequestService';
-import { addProduct } from 'services/productService';
+import { addProduct, getProductById } from 'services/productService';
 
 const AdminRequestsScreen = () => {
   const navigation = useNavigation();
@@ -60,9 +60,46 @@ const AdminRequestsScreen = () => {
   // Function to handle accept/deny actions
   const handleAction = async (requestId, newStatus, requestItem) => {
     if (newStatus === 'accepted') {
-      setModalRequest({ ...requestItem, id: requestId });
+      // Check if product already exists for this request
+      if (requestItem.productId) {
+        try {
+          const existingProduct = await getProductById(requestItem.productId);
+          if (existingProduct) {
+            // Product exists, just update status without prompting for price
+            const originalRequests = [...requests];
+            setRequests((prevRequests) =>
+              prevRequests.map((req) => (req.id === requestId ? { ...req, status: 'accepted' } : req))
+            );
+            const result = await updateRequestStatus(requestId, 'accepted');
+            if (!result.success) {
+              setRequests(originalRequests);
+              Alert.alert('Error', 'Failed to update request status.');
+            } else {
+              Alert.alert('Success', 'Request accepted. Product already exists.');
+              // Refresh requests to reflect updated status
+              loadRequests();
+            }
+            return;
+          }
+        } catch (err) {
+          // If error in checking product, fallback to price modal
+        }
+      }
+      setModalRequest(null);
       setPriceInput('');
-      setModalVisible(true);
+      setModalVisible(false);
+      // Also update status to accepted if product exists but not found for some reason
+      const originalRequests = [...requests];
+      setRequests((prevRequests) =>
+        prevRequests.map((req) => (req.id === requestId ? { ...req, status: 'accepted' } : req))
+      );
+      const result = await updateRequestStatus(requestId, 'accepted');
+      if (!result.success) {
+        setRequests(originalRequests);
+        Alert.alert('Error', 'Failed to update request status.');
+      } else {
+        loadRequests();
+      }
       return;
     }
     // Optimistic UI update
