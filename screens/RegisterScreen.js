@@ -38,7 +38,6 @@ function RegisterScreen(props) {
     }
     try {
       const userCredential = await Auth.signup(name, email, password);
-      // Send confirmation email if available
       if (userCredential && userCredential.user && userCredential.user.sendEmailVerification) {
         await userCredential.user.sendEmailVerification();
       }

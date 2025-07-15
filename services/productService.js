@@ -1,4 +1,26 @@
-import { query, where, getDocs } from 'firebase/firestore';
+import { getFirestore, collection, addDoc, query, where, getDocs } from 'firebase/firestore';
+import { firebaseApp } from 'auth/firebaseAuth';
+
+const db = getFirestore(firebaseApp);
+
+export const addShipment = async (shipment) => {
+  try {
+    await addDoc(collection(db, 'shipments'), shipment);
+  } catch (error) {
+    console.error('Error adding shipment:', error);
+  }
+};
+
+export const getShipmentsByUser = async (userId) => {
+  try {
+    const q = query(collection(db, 'shipments'), where('userId', '==', userId));
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  } catch (error) {
+    console.error('Error fetching shipments:', error);
+    return [];
+  }
+};
 /**
  * Fetches a product from Firestore by customRequestId field.
  * @param {string} customRequestId
@@ -38,8 +60,6 @@ export const updateProductPrice = async (productId, newPrice) => {
     throw error;
   }
 };
-import { collection, addDoc, doc, deleteDoc, updateDoc } from 'firebase/firestore';
-import { db } from '../auth/firebaseAuth';
 
 /**
  * 

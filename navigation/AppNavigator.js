@@ -13,6 +13,8 @@ import CheckoutScreen from 'screens/CheckoutScreen';
 import CustomerInquiry from 'screens/CustomerInquiry';
 import UserInquiry from 'screens/UserInquiry';
 import AdminInquiry from 'screens/AdminInquiry';
+import ShipmentTrackingScreen from 'screens/ShipmentTrackingScreen';
+import AdminShipmentTrackingScreen from 'screens/AdminShipmentTrackingScreen';
 
 const Stack = createStackNavigator();
 
@@ -34,6 +36,8 @@ const AppNavigator = () => {
       <Stack.Screen name="UserInquiry" component={UserInquiry} />
       <Stack.Screen name="CustomerInquiry" component={CustomerInquiry} />
       <Stack.Screen name="AdminInquiry" component={AdminInquiry} />
+      <Stack.Screen name="AdminShipmentTracking" component={AdminShipmentTrackingScreen} />
+      <Stack.Screen name="ShipmentTracking" component={ShipmentTrackingScreen} />
     </Stack.Navigator>
   );
 };

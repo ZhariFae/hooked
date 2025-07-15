@@ -119,13 +119,17 @@ function ProfileScreen(props) {
             }
           />
           <Row
+            title={userRole === 'Admin' ? 'Manage Shipments' : 'Track Shipment'}
+            iconColor={'#e0f7fa'}
+            icon={<MaterialCommunityIcons name="truck-delivery" size={24} color={colors.black} />}
+            index={userRole === 'Admin' ? 3 : 1}
+            onPress={() => navigation.navigate(userRole === 'Admin' ? 'AdminShipmentTracking' : 'ShipmentTracking')}
+          />
+          <Row
             title={'Log out'}
             iconColor={'#d1d1d1'}
             icon={<MaterialCommunityIcons name="logout" size={24} color={colors.black} />}
-            // Adjust index based on admin rows presence.
-            // Admin has 4 items, user has 2.
-            // The index is the position in the list (0-based).
-            index={userRole === 'Admin' ? 3 : 1}
+            index={userRole === 'Admin' ? 4 : 2}
             onPress={() => Auth.logout()}
           />
         </View>
