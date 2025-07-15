@@ -7,7 +7,7 @@ import colors from 'config/colors';
 import { radius, spacingX, spacingY } from 'config/spacing';
 import { BlurView } from 'expo-blur';
 import React, { useCallback, useState, useEffect } from 'react'; // Added useEffect
-import { View, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, Image, TouchableOpacity, ScrollView } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useNavigation } from '@react-navigation/native'; // Import useNavigation
 import { normalizeY } from 'utils/normalize';
@@ -58,82 +58,90 @@ function ProfileScreen(props) {
   return (
     <ScreenComponent style={styles.container}>
       <BlurView intensity={100} tint="extraLight" style={styles.blurContainer} />
-      <View style={styles.topRow}>
-        <Image
-          source={{
-            uri: Auth.user?.photoURL || placeholderImage,
-          }}
-          style={styles.img}
-        />
-        <View style={{ gap: spacingY._7, marginTop: spacingY._5, alignItems: 'center' }}>
-          <Typo size={22} style={styles.name}>
-            {userName}
-          </Typo>
-          <Typo size={16} style={{ color: colors.gray, fontWeight: '500' }}>
-            {userEmail}
-          </Typo>
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 40 }}>
+        <View style={styles.topRow}>
+          <Image
+            source={{
+              uri: Auth.user?.photoURL || placeholderImage,
+            }}
+            style={styles.img}
+          />
+          <View style={{ gap: spacingY._7, marginTop: spacingY._5, alignItems: 'center' }}>
+            <Typo size={22} style={styles.name}>
+              {userName}
+            </Typo>
+            <Typo size={16} style={{ color: colors.gray, fontWeight: '500' }}>
+              {userEmail}
+            </Typo>
+          </View>
         </View>
-      </View>
-      <View style={{ flex: 1, gap: 15 }}>
-        <View style={styles.bottomContainer}>
-          {userRole === 'Admin' && (
-            <>
-              <Row
-                title={'Add New Product'}
-                iconColor={colors.lightBlue} // Choose a suitable color
-                icon={<MaterialCommunityIcons name="plus-box" size={24} color={colors.black} />}
-                index={0} // Adjust index for animation order
-                onPress={() => navigation.navigate('AdminAddProduct')} // Placeholder navigation
-              />
-              <Row
-                title={'Manage Products'}
-                iconColor={colors.lightBlue}
-                icon={<MaterialCommunityIcons name="pencil-box-multiple" size={24} color={colors.black} />}
-                index={1}
-                onPress={() => navigation.navigate('AdminManageProducts')} // Placeholder navigation for delete/activate
-              />
-              {/* Add a separator if desired between admin and user options */}
-              {/* <View style={styles.line} /> */}
-            </>
-          )}
-          <Row
-            title={userRole === 'Admin' ? 'View Custom Requests' : 'Custom Product Request'}
-            iconColor={'#fdf2f8'}
-            icon={
-              <MaterialCommunityIcons name="comment-question-outline" size={24} color={colors.black} />
-            }
-            index={userRole === 'Admin' ? 2 : 0}
-            onPress={() =>
-              navigation.navigate(userRole === 'Admin' ? 'AdminRequests' : 'UserRequests')
-            }
-          />
-          <Row
-            title={userRole === 'Admin' ? 'View Customer Inquiries' : 'Customer Inquiry'}
-            iconColor={'#fdf2f8'}
-            icon={
-              <MaterialCommunityIcons name="comment-question-outline" size={24} color={colors.black} />
-            }
-            index={userRole === 'Admin' ? 2 : 0}
-            onPress={() =>
-              navigation.navigate(userRole === 'Admin' ? 'AdminInquiry' : 'UserInquiry')
-            }
-          />
-          <Row
-            title={userRole === 'Admin' ? 'Manage Shipments' : 'Track Shipment'}
-            iconColor={'#e0f7fa'}
-            icon={<MaterialCommunityIcons name="truck-delivery" size={24} color={colors.black} />}
-            index={userRole === 'Admin' ? 3 : 1}
-            onPress={() => navigation.navigate(userRole === 'Admin' ? 'AdminShipmentTracking' : 'ShipmentTracking')}
-          />
-          <Row
-            title={'Log out'}
-            iconColor={'#d1d1d1'}
-            icon={<MaterialCommunityIcons name="logout" size={24} color={colors.black} />}
-            index={userRole === 'Admin' ? 4 : 2}
-            onPress={() => Auth.logout()}
-          />
+        <View style={{ flex: 1, gap: 15 }}>
+          <View style={styles.bottomContainer}>
+            {userRole === 'Admin' && (
+              <>
+                <Row
+                  title={'Add New Product'}
+                  iconColor={colors.lightBlue}
+                  icon={<MaterialCommunityIcons name="plus-box" size={24} color={colors.black} />}
+                  index={0}
+                  onPress={() => navigation.navigate('AdminAddProduct')}
+                />
+                <Row
+                  title={'Manage Products'}
+                  iconColor={colors.lightBlue}
+                  icon={<MaterialCommunityIcons name="pencil-box-multiple" size={24} color={colors.black} />}
+                  index={1}
+                  onPress={() => navigation.navigate('AdminManageProducts')}
+                />
+              </>
+            )}
+            <Row
+              title={userRole === 'Admin' ? 'View Custom Requests' : 'Custom Product Request'}
+              iconColor={'#fdf2f8'}
+              icon={
+                <MaterialCommunityIcons name="comment-question-outline" size={24} color={colors.black} />
+              }
+              index={userRole === 'Admin' ? 2 : 0}
+              onPress={() =>
+                navigation.navigate(userRole === 'Admin' ? 'AdminRequests' : 'UserRequests')
+              }
+            />
+            <Row
+              title={userRole === 'Admin' ? 'View Customer Inquiries' : 'Customer Inquiry'}
+              iconColor={'#fdf2f8'}
+              icon={
+                <MaterialCommunityIcons name="comment-question-outline" size={24} color={colors.black} />
+              }
+              index={userRole === 'Admin' ? 2 : 0}
+              onPress={() =>
+                navigation.navigate(userRole === 'Admin' ? 'AdminInquiry' : 'UserInquiry')
+              }
+            />
+            <Row
+              title={userRole === 'Admin' ? 'Manage Shipments' : 'Track Shipment'}
+              iconColor={'#e0f7fa'}
+              icon={<MaterialCommunityIcons name="truck-delivery" size={24} color={colors.black} />}
+              index={userRole === 'Admin' ? 3 : 1}
+              onPress={() => navigation.navigate(userRole === 'Admin' ? 'AdminShipmentTracking' : 'ShipmentTracking')}
+            />
+            {/* Transaction History Button */}
+            <Row
+              title={'Transaction History'}
+              iconColor={'#e8f5e9'}
+              icon={<MaterialCommunityIcons name="history" size={24} color={colors.black} />}
+              index={userRole === 'Admin' ? 5 : 3}
+              onPress={() => navigation.navigate('TransactionHistory', { userId: Auth.user?.uid })}
+            />
+            <Row
+              title={'Log out'}
+              iconColor={'#d1d1d1'}
+              icon={<MaterialCommunityIcons name="logout" size={24} color={colors.black} />}
+              index={userRole === 'Admin' ? 6 : 4}
+              onPress={() => Auth.logout()}
+            />
+          </View>
         </View>
-      </View>
+      </ScrollView>
     </ScreenComponent>
   );
 }

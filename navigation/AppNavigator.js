@@ -15,6 +15,7 @@ import UserInquiry from 'screens/UserInquiry';
 import AdminInquiry from 'screens/AdminInquiry';
 import ShipmentTrackingScreen from 'screens/ShipmentTrackingScreen';
 import AdminShipmentTrackingScreen from 'screens/AdminShipmentTrackingScreen';
+import TransactionHistoryScreen  from 'screens/TransactionHistoryScreen';
 
 const Stack = createStackNavigator();
 
@@ -38,6 +39,7 @@ const AppNavigator = () => {
       <Stack.Screen name="AdminInquiry" component={AdminInquiry} />
       <Stack.Screen name="AdminShipmentTracking" component={AdminShipmentTrackingScreen} />
       <Stack.Screen name="ShipmentTracking" component={ShipmentTrackingScreen} />
+      <Stack.Screen name="TransactionHistory" component={TransactionHistoryScreen} />
     </Stack.Navigator>
   );
 };

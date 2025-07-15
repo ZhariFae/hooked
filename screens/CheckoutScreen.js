@@ -20,7 +20,7 @@ import useAuth from 'auth/useAuth';
 import { useCallback } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import { addUserAddress, getUserAddresses } from 'services/userDataService';
-import { addShipment } from 'services/productService';
+import { addShipment, addTransaction } from 'services/productService';
 import { formatPrice } from 'utils/format';
 import GCashQrModalContent from 'components/GCashQrModalContent';
 
@@ -131,12 +131,21 @@ function CheckoutScreen({ route }) {
           onPress={async () => {
             setGcashModalVisible(true);
             // Create shipment in Firebase
-            // You may want to generate orderId and productId based on your cart/order logic
             const orderId = `ORD${Math.floor(Math.random() * 100000)}`;
             const status = 'Pending';
             const expectedDelivery = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
             // For demo, assuming cart contains a single productId, you may need to adjust for multiple products
-            await addShipment({ orderId, status, productId, expectedDelivery, userId: user.uid });
+            await addShipment({ orderId, status, expectedDelivery, userId: user.uid });
+
+            // Add transaction history using productService
+            await addTransaction({
+              userId: user.uid,
+              orderId,
+              amount: finalTotal,
+              date: new Date().toISOString().split('T')[0],
+              status: 'Paid',
+              paymentMethod: selectedMethod,
+            });
           }}
         >
           <Typo style={{ color: selectedAddress ? colors.white : colors.gray, fontWeight: '600', fontSize: 18 }}>

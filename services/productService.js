@@ -1,3 +1,4 @@
+
 import { getFirestore, collection, addDoc, query, where, getDocs } from 'firebase/firestore';
 import { firebaseApp } from 'auth/firebaseAuth';
 
@@ -19,6 +20,19 @@ export const getShipmentsByUser = async (userId) => {
   } catch (error) {
     console.error('Error fetching shipments:', error);
     return [];
+  }
+};
+
+/**
+ * Adds a transaction to Firestore.
+ * @param {object} transaction - Transaction data to add
+ * @returns {Promise<void>}
+ */
+export const addTransaction = async (transaction) => {
+  try {
+    await addDoc(collection(db, 'transactions'), transaction);
+  } catch (error) {
+    console.error('Error adding transaction:', error);
   }
 };
 /**
