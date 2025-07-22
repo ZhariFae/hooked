@@ -146,6 +146,18 @@ function CheckoutScreen({ route }) {
               status: 'Paid',
               paymentMethod: selectedMethod,
             });
+
+            // Show confirmation to user
+            Alert.alert(
+              'Request Sent',
+              'Your order has been placed and a request was sent to the admin.',
+              [
+                {
+                  text: 'OK',
+                  onPress: () => {},
+                },
+              ]
+            );
           }}
         >
           <Typo style={{ color: selectedAddress ? colors.white : colors.gray, fontWeight: '600', fontSize: 18 }}>
