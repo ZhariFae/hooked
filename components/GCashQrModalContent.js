@@ -16,7 +16,7 @@ const GCashQrModalContent = ({ totalAmount, onClose }) => {
   const randomNumber = Math.floor(Math.random() * 1000000); 
   // Using a placeholder image for a non-working QR code.
   // The 'text' parameter includes a random number to make it unique on each render.
-  const qrCodeImage = { uri: `https://placehold.co/250x250/E0E0E0/333333?text=QR+Code+${randomNumber}` };
+  const qrCodeImage = require('../assets/clientgcash.png');
 
   return (
     <View style={styles.modalContent}>
