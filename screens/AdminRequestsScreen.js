@@ -85,21 +85,10 @@ const AdminRequestsScreen = () => {
           // If error in checking product, fallback to price modal
         }
       }
-      setModalRequest(null);
+      // If no product exists, show the price modal instead of updating status immediately
+      setModalRequest(requestItem);
       setPriceInput('');
-      setModalVisible(false);
-      // Also update status to accepted if product exists but not found for some reason
-      const originalRequests = [...requests];
-      setRequests((prevRequests) =>
-        prevRequests.map((req) => (req.id === requestId ? { ...req, status: 'accepted' } : req))
-      );
-      const result = await updateRequestStatus(requestId, 'accepted');
-      if (!result.success) {
-        setRequests(originalRequests);
-        Alert.alert('Error', 'Failed to update request status.');
-      } else {
-        loadRequests();
-      }
+      setModalVisible(true);
       return;
     }
     // Optimistic UI update
